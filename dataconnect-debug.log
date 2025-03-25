@@ -1,0 +1,36 @@
+I0318 23:21:21.368117    8698 load.go:37] Reloading schema and connectors...
+W0318 23:21:21.422529    8698 control.go:51] [/emulator/app eefb] connector "connector" has errors: input: connector source must not contain anonymous operations
+
+sources: connector/mutations.gql [0B] connector/queries.gql [135B] 
+I0318 23:21:21.422856    8698 control.go:59] [/emulator/app eefb] UpdateResources(): done
+Schema: sources: schema/schema.gql [1061B] 
+Connector "connector": sources: connector/mutations.gql [0B] connector/queries.gql [135B] 
+E0318 23:21:21.424464    8698 load.go:79] Could not load sources: <nil>
+I0318 23:21:21.426146    8698 collector.go:107] schema extensions wrote into "/Users/bleigh/code/next25-movies/dataconnect/.dataconnect/schema"
+Generated sources: main/mutation.gql [15983B] main/implicit.gql [1241B] main/input.gql [26674B] prelude.gql [67020B] main/relation.gql [6468B] main/query.gql [7654B] 
+I0318 23:21:21.426241    8698 load.go:80] Finished reloading
+I0318 23:21:21.430042    8698 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:9399
+I0318 23:21:21.430949    8698 dev.go:95] Listening on address (HTTP + gRPC): [::1]:9399
+I0318 23:21:23.546579    8698 migrate.go:24] Running migration SQL:
+Step 1: CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+Step 2: CREATE EXTENSION IF NOT EXISTS "vector"
+Step 3: CREATE TABLE "public"."movie" ("id" text NOT NULL, "description" text NULL, "embedding" vector(768) NULL, "genre" text NOT NULL, "poster_url" text NOT NULL, "release_date" date NOT NULL, "tags" text[] NULL, "title" text NOT NULL, PRIMARY KEY ("id"))
+Step 4: CREATE TABLE "public"."user" ("uid" text NOT NULL DEFAULT replace((uuid_generate_v4())::text, '-'::text, ''::text), "username" text NOT NULL, PRIMARY KEY ("uid"))
+Step 5: CREATE TABLE "public"."review" ("movie_id" text NOT NULL, "user_uid" text NOT NULL, "embedding" vector(768) NULL, "rating" integer NOT NULL, "review" text NULL, "review_time" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY ("movie_id", "user_uid"), CONSTRAINT "review_movie_id_fkey" FOREIGN KEY ("movie_id") REFERENCES "public"."movie" ("id") ON DELETE CASCADE, CONSTRAINT "review_user_uid_fkey" FOREIGN KEY ("user_uid") REFERENCES "public"."user" ("uid") ON DELETE CASCADE)
+Step 6: CREATE INDEX "review_movieId_idx" ON "public"."review" ("movie_id")
+Step 7: CREATE INDEX "review_userUid_idx" ON "public"."review" ("user_uid")
+Step 8: CREATE TABLE "public"."actor" ("id" text NOT NULL, "birth_date" date NOT NULL, "image_url" text NOT NULL, "name" text NOT NULL, PRIMARY KEY ("id"))
+Step 9: CREATE TABLE "public"."role" ("movie_id" text NOT NULL, "actor_id" text NOT NULL, "character" text NULL, "description" text NULL, PRIMARY KEY ("movie_id", "actor_id"), CONSTRAINT "role_actor_id_fkey" FOREIGN KEY ("actor_id") REFERENCES "public"."actor" ("id") ON DELETE CASCADE, CONSTRAINT "role_movie_id_fkey" FOREIGN KEY ("movie_id") REFERENCES "public"."movie" ("id") ON DELETE CASCADE)
+Step 10: CREATE INDEX "role_actorId_idx" ON "public"."role" ("actor_id")
+Step 11: CREATE INDEX "role_movieId_idx" ON "public"."role" ("movie_id")
+W0318 23:21:23.747943    8698 control.go:51] [/emulator/app 92f3] connector "connector" has errors: input: connector source must not contain anonymous operations
+
+sources: connector/mutations.gql [0B] connector/queries.gql [135B] 
+I0318 23:21:23.748009    8698 control.go:59] [/emulator/app 92f3] UpdateResources(): done
+Schema: sources: schema/schema.gql [1061B] 
+Connector "connector": sources: connector/mutations.gql [0B] connector/queries.gql [135B] 
+I0318 23:21:23.748053    8698 service.go:143] [/emulator/app 92f3] while configuring to server.Settings{ConnectionString:"dbname='app' host='127.0.0.1' port='5433' sslmode='disable' dbname='app'", MaxOpenConnection:1, UseDummy:false, EnableGoogleMLIntegration:false, SchemaValidationMode:""}, failed to reload last live sources: input: connector source must not contain anonymous operations
+I0318 23:21:28.550492    8698 prepare.go:115] [operation "" attempt 1] preparePlan succeeded
+I0318 23:21:28.550584    8698 prepare.go:106] [operation "" attempt 1] DBStats beforePrepare: sql.DBStats{MaxOpenConnections:1, OpenConnections:1, InUse:0, Idle:1, WaitCount:0, WaitDuration:0, MaxIdleClosed:0, MaxIdleTimeClosed:0, MaxLifetimeClosed:0}, afterPrepare: sql.DBStats{MaxOpenConnections:1, OpenConnections:1, InUse:0, Idle:1, WaitCount:0, WaitDuration:0, MaxIdleClosed:0, MaxIdleTimeClosed:0, MaxLifetimeClosed:0}
+I0318 23:21:28.553301    8698 executor.go:97] [operation "" attempt 1] DBStats beforeRun: sql.DBStats{MaxOpenConnections:1, OpenConnections:1, InUse:0, Idle:1, WaitCount:0, WaitDuration:0, MaxIdleClosed:0, MaxIdleTimeClosed:0, MaxLifetimeClosed:0}, afterRun: sql.DBStats{MaxOpenConnections:1, OpenConnections:1, InUse:0, Idle:1, WaitCount:0, WaitDuration:0, MaxIdleClosed:0, MaxIdleTimeClosed:0, MaxLifetimeClosed:0}
+I0318 23:21:28.553574    8698 engine.go:148] [/emulator/app 92f3] ExecuteGraphql : succeeded. 

@@ -1,0 +1,24 @@
+# App Information
+
+This is a Next.js app demo built for Google Cloud Next 2025. It uses the following tech:
+
+- PNPM package manager
+- TypeScript
+- Next.js 15 (with App Router)
+- React 19
+- Tailwind 4.0
+- ShadCN Components
+- Firebase Data Connect
+- Firebase Genkit
+
+# Guidelines for Coding
+
+- ALWAYS use `pnpm` commands for package management.
+- ALWAYS use `pnpm dlx shadcn add <components...>` to add components. DO NOT use `shadcn-ui`.
+- NEVER start a dev server or access the browser to check something. Ask the user to check.
+- Use ShadCN components for UI where possible. When necessary, create new components in `src/components`.
+- Use `kebab-case-naming.ts` for files. Make sure to use `.tsx` for files that include JSX syntax.
+- ALWAYS use `@/` imports, NEVER add extensions to imports (Correct: `@/lib/firebase-admin`)
+- Prefer `export default function SomeComponent() {}` when creating components. Define props as a separate exported interface.
+- ALWAYS re-read files before editing after a user-supplied message. The user may have made changes.
+- When generating files, leave a descriptive comment at the top.

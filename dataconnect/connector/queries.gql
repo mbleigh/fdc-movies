@@ -1,0 +1,12 @@
+# This is a file for you to write an un-named query.
+# Only one un-named query is allowed per file.
+query ListMovies {
+  movies {
+    title
+    stats: movieStats_on_movie {
+      reviewCount
+      avgRating
+      watchCount
+    }
+  }
+}

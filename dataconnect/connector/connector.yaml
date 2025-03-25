@@ -1,0 +1,7 @@
+connectorId: connector
+generate:
+  javascriptSdk:
+    outputDir: ../../generated/data
+    package: "@app/data"
+    packageJsonDir: ../..
+    react: true

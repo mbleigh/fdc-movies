@@ -9,17 +9,38 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@firebasegen/movie-connector-connector": "file:dataconnect-generated/js/movie-connector-connector",
+    "@genkit-ai/firebase": "^1.1.0",
+    "@genkit-ai/vertexai": "^1.1.0",
+    "@radix-ui/react-avatar": "^1.1.3",
+    "@radix-ui/react-popover": "^1.1.6",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@types/react-motion": "^0.0.40",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.5.2",
+    "firebase": "^11.4.0",
+    "firebase-admin": "^13.2.0",
+    "framer-motion": "^12.4.11",
+    "genkit": "^1.1.0",
+    "lucide-react": "^0.479.0",
+    "next": "15.2.1",
+    "next-themes": "^0.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.2.1"
+    "react-motion": "^0.5.2",
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@faker-js/faker": "^9.6.0",
+    "@google/genai": "^0.4.0",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   },
   "packageManager": "pnpm@9.15.5+sha256.8472168c3e1fd0bff287e694b053fccbbf20579a3ff9526b6333beab8df65a8d"
 }

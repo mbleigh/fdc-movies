@@ -1,68 +1,74 @@
 type Movie @table {
-  id: String!
-  title: String!
-  posterUrl: String!
-  releaseDate: Date!
-  genre: String!
-  description: String
-  tags: [String]
-  embedding: Vector @col(size: 768) # Enables vector search
+	id: String!
+	title: String!
+	"MPAA Rating (G, PG, PG-13, R)"
+	rating: String! @default(value: "PG")
+	posterUrl: String!
+	releaseDate: Date!
+	genre: String!
+	description: String
+	tags: [String]
+	embedding: Vector @col(size: 768) # Enables vector search
 }
 
 type Role @table(key: ["movie", "actor"]) {
-  movie: Movie!
-  actor: Actor!
-  character: String
-  description: String
+	movie: Movie!
+	actor: Actor!
+	character: String
+	description: String
 }
 
 type Actor @table {
-  id: String!
-  name: String!
-  imageUrl: String!
-  birthDate: Date!
+	id: String!
+	name: String!
+	imageUrl: String!
+	birthDate: Date!
 }
 
 type User @table(key: "uid") {
-  uid: String! @default(expr: "uuidV4()")
-  username: String!
+	uid: String! @default(expr: "uuidV4()")
+	imageUrl: String
+	displayName: String
+	username: String!
 }
 
 type Watch @table {
-  movie: Movie!
-  user: User!
-  "one of 'theater-premium' (IMAX), 'theater', 'home', 'mobile'"
-  format: String
-  watchDate: Date! @default(expr: "request.time")
-  "A watch can optionally be associated with a review."
-  review: Review
+	movie: Movie!
+	user: User!
+	"one of 'theater-premium' (IMAX), 'theater', 'home', 'mobile'"
+	format: String
+	watchDate: Date! @default(expr: "request.time")
+	"A watch can optionally be associated with a review."
+	review: Review @unique
 }
 
 type Review @table {
-  user: User!
-  movie: Movie!
-  "Integer between 0-10 corresponding to a star rating (0 = 0 stars, 5 = 2.5 stars, 10 = 5 stars)"
-  rating: Int!
-  review: String
-  reviewTime: Timestamp! @default(expr: "request.time")
-  embedding: Vector @col(size: 768)
+	user: User!
+	movie: Movie!
+	"Integer between 0-10 corresponding to a star rating (0 = 0 stars, 5 = 2.5 stars, 10 = 5 stars)"
+	rating: Int!
+	review: String
+	reviewTime: Timestamp! @default(expr: "request.time")
+	embedding: Vector @col(size: 768)
 }
 
 type MovieStats
-  @view(
-    sql: """
-    SELECT
-      r.movie_id,
-      COUNT(r.*) AS review_count,
-      AVG(r.rating) AS avg_rating,
-      COUNT(w.*) AS watch_count
-    FROM review r
-    LEFT JOIN watch w ON r.movie_id = w.movie_id
-    GROUP BY r.movie_id
-    """
-  ) {
-  movie: Movie @unique
-  watchCount: Int
-  reviewCount: Int
-  avgRating: Float
+	@view(
+		sql: """
+		SELECT
+		  m.id as movie_id,
+		  COUNT(DISTINCT r.id) AS review_count,
+		  AVG(r.rating) AS avg_rating,
+		  COUNT(DISTINCT w.id) AS watch_count
+		FROM movie m
+		LEFT JOIN review r on m.id = r.movie_id
+		LEFT JOIN watch w ON m.id = w.movie_id
+		GROUP BY m.id
+		"""
+	)
+{
+	movie: Movie @unique
+	watchCount: Int
+	reviewCount: Int
+	avgRating: Float
 }

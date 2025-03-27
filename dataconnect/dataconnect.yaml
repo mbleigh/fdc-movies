@@ -8,4 +8,4 @@ schema:
       database: "app"
       cloudSql:
         instanceId: "movies-app"
-connectorDirs: ["./connector"]
+connectorDirs: ["./connector", "./tools"]

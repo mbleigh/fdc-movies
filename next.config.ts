@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+	images: {
+		remotePatterns: [
+			{
+				hostname: "storage.googleapis.com",
+				pathname: "/next25-movies.firebasestorage.app/**",
+			},
+		],
+	},
 };
 
 export default nextConfig;

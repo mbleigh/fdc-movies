@@ -1,0 +1,112 @@
+fragment MovieResult on Movie {
+	id
+	title
+	description
+	rating
+	releaseDate
+	genre
+	stats: movieStats_on_movie {
+		avgRating
+		reviewCount
+		watchCount
+	}
+}
+
+# Perform a semantic search of movies
+query SearchMovies(
+	# semantic search query
+	$query: String!
+	# earliest acceptable release date - omit for no lower bound
+	$minDate: Date
+	# latest acceptable release date - omit for no upper bound
+	$maxDate: Date
+	# lowest acceptable average rating for the movie, on a scale from 0.0 to 10.0
+	$minRating: Float
+	# array of acceptable ratings for the movie, such as ["G", "PG"] for family-friendly movies. omit for all ratings
+	$ratings: [String!]
+	# genres to allow results from. omit for all genres
+	$genres: [String!]
+) @auth(level: PUBLIC) {
+	movies: movies_embedding_similarity(
+		compare_embed: { model: "text-embedding-005", text: $query }
+		where: {
+			releaseDate: { ge: $minDate, le: $maxDate }
+			rating: { in: $ratings }
+			genre: { in: $genres }
+			movieStats_on_movie: { avgRating: { ge: $minRating } }
+		}
+		limit: 10
+	) {
+		...MovieResult
+	}
+}
+
+# Return a filtered of movies based on criteria
+query FilterMovies(
+	# partial title to match - omit for all titles
+	$partialTitle: String
+	# earliest acceptable release date - omit for no lower bound
+	$minDate: Date
+	# latest acceptable release date - omit for no upper bound
+	$maxDate: Date
+	# lowest acceptable average rating for the movie, on a scale from 0.0 to 10.0
+	$minRating: Float
+	# array of acceptable ratings for the movie, such as ["G", "PG"] for family-friendly movies. omit for all ratings
+	$ratings: [String!]
+	# genres to allow results from. omit for all genres
+	$genres: [String!]
+) @auth(level: PUBLIC) {
+	movies(
+		where: {
+			title: { contains: $partialTitle }
+			releaseDate: { ge: $minDate, le: $maxDate }
+			rating: { in: $ratings }
+			genre: { in: $genres }
+			movieStats_on_movie: { avgRating: { ge: $minRating } }
+		}
+		limit: 30
+	) {
+		...MovieResult
+	}
+}
+
+query SearchReviews(
+	# semantic search terms for review contents
+	$query: String!
+	# earliest acceptable movie release date - omit for no lower bound
+	$minDate: Date
+	# latest acceptable movie release date - omit for no upper bound
+	$maxDate: Date
+	# lowest acceptable review rating to match, on a scale from 0 to 10
+	$minReviewRating: Int
+	# lowest acceptable average rating for the movie, on a scale from 0.0 to 10.0
+	$minAvgRating: Float
+	# array of acceptable ratings for the movie, such as ["G", "PG"] for family-friendly movies. omit for all ratings
+	$ratings: [String!]
+	# genres to allow results from. omit for all genres
+	$genres: [String!]
+) @auth(level: USER) {
+	reviews: reviews_embedding_similarity(
+		compare_embed: { text: $query, model: "text-embedding-005" }
+		where: {
+			rating: { ge: $minReviewRating }
+			movie: {
+				releaseDate: { ge: $minDate, le: $maxDate }
+				rating: { in: $ratings }
+				genre: { in: $genres }
+				movieStats_on_movie: { avgRating: { ge: $minAvgRating } }
+			}
+		}
+		limit: 10
+	) {
+		user {
+			username
+		}
+		rating
+		review
+		reviewTime
+		movie {
+			...MovieResult
+		}
+	}
+}

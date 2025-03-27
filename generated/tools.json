@@ -1,0 +1,136 @@
+{
+  "connector": "tools",
+  "location": "us-central1",
+  "service": "app",
+  "tools": [
+    {
+      "name": "SearchMovies",
+      "type": "query",
+      "description": "Perform a semantic search of movies",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "genres": {
+            "description": "genres to allow results from. omit for all genres",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "maxDate": {
+            "description": "latest acceptable release date - omit for no upper bound",
+            "type": "string"
+          },
+          "minDate": {
+            "description": "earliest acceptable release date - omit for no lower bound",
+            "type": "string"
+          },
+          "minRating": {
+            "description": "lowest acceptable average rating for the movie, on a scale from 0.0 to 10.0",
+            "type": "number"
+          },
+          "query": {
+            "description": "semantic search query",
+            "type": "string"
+          },
+          "ratings": {
+            "description": "array of acceptable ratings for the movie, such as [\"G\", \"PG\"] for family-friendly movies. omit for all ratings",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "FilterMovies",
+      "type": "query",
+      "description": "Return a filtered of movies based on criteria",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "genres": {
+            "description": "genres to allow results from. omit for all genres",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "maxDate": {
+            "description": "latest acceptable release date - omit for no upper bound",
+            "type": "string"
+          },
+          "minDate": {
+            "description": "earliest acceptable release date - omit for no lower bound",
+            "type": "string"
+          },
+          "minRating": {
+            "description": "lowest acceptable average rating for the movie, on a scale from 0.0 to 10.0",
+            "type": "number"
+          },
+          "partialTitle": {
+            "description": "partial title to match - omit for all titles",
+            "type": "string"
+          },
+          "ratings": {
+            "description": "array of acceptable ratings for the movie, such as [\"G\", \"PG\"] for family-friendly movies. omit for all ratings",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        }
+      }
+    },
+    {
+      "name": "SearchReviews",
+      "type": "query",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "genres": {
+            "description": "genres to allow results from. omit for all genres",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "maxDate": {
+            "description": "latest acceptable movie release date - omit for no upper bound",
+            "type": "string"
+          },
+          "minAvgRating": {
+            "description": "lowest acceptable average rating for the movie, on a scale from 0.0 to 10.0",
+            "type": "number"
+          },
+          "minDate": {
+            "description": "earliest acceptable movie release date - omit for no lower bound",
+            "type": "string"
+          },
+          "minReviewRating": {
+            "description": "lowest acceptable review rating to match, on a scale from 0 to 10",
+            "type": "integer"
+          },
+          "query": {
+            "description": "semantic search terms for review contents",
+            "type": "string"
+          },
+          "ratings": {
+            "description": "array of acceptable ratings for the movie, such as [\"G\", \"PG\"] for family-friendly movies. omit for all ratings",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
+  ]
+}

@@ -1,37 +1,38 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import Header from "@/components/header";
+import { QueryClientProvider } from "@tanstack/react-query";
+import Providers from "./providers";
+import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const nunito = Nunito({
+	variable: "--font-nunito",
+	subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Movie Recommender",
-  description: "AI-powered movie recommendations",
+	title: "Movie Recommender",
+	description: "AI-powered movie recommendations",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body className={`${nunito.variable} antialiased font-sans`}>
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+					<Providers>
+						<Header />
+						<main>{children}</main>
+						<Toaster />
+					</Providers>
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }

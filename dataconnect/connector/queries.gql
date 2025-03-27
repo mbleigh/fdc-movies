@@ -1,12 +1,91 @@
-# This is a file for you to write an un-named query.
-# Only one un-named query is allowed per file.
-query ListMovies {
-  movies {
-    title
-    stats: movieStats_on_movie {
-      reviewCount
-      avgRating
-      watchCount
-    }
-  }
+fragment MovieOverview on Movie {
+	id
+	rating
+	title
+	posterUrl
+	genre
+	releaseDate
+	stats: movieStats_on_movie {
+		watchCount
+		reviewCount
+		avgRating
+	}
+}
+
+fragment ReviewOverview on Review {
+	id
+	user {
+		username
+	}
+	rating
+	review
+	reviewTime
+	watch: watch_on_review {
+		watchDate
+		format
+	}
+}
+
+query HomePage @auth(level: PUBLIC) {
+	newReleases: movies(limit: 4, orderBy: [{ releaseDate: DESC }]) {
+		...MovieOverview
+	}
+	topMovies: movieStatss(limit: 5, orderBy: [{ avgRating: DESC }]) {
+		movie {
+			...MovieOverview
+		}
+	}
+	recentReviews: reviews(orderBy: [{ reviewTime: DESC }], limit: 10) {
+		...ReviewOverview
+		movie {
+			...MovieOverview
+		}
+	}
+}
+
+query SearchMovies($query: String!) @auth(level: PUBLIC) {
+	movies: movies_embedding_similarity(
+		compare_embed: { text: $query, model: "text-embedding-005" }
+		limit: 10
+	) {
+		...MovieOverview
+		description
+	}
+}
+
+query MoviePage($movieId: String!) @auth(level: PUBLIC) {
+	movie(id: $movieId) {
+		...MovieOverview
+		description
+		reviews: reviews_on_movie(orderBy: [{ reviewTime: DESC }], limit: 10) {
+			...ReviewOverview
+		}
+		roles: roles_on_movie {
+			character
+			description
+			actor {
+				id
+				name
+				imageUrl
+			}
+		}
+	}
+}
+
+query WatchHistoryPage($limit: Int) @auth(level: USER) {
+	watches(
+		where: { userUid: { eq_expr: "auth.uid" } }
+		orderBy: [{ watchDate: DESC }]
+		limit: $limit
+	) {
+		id
+		watchDate
+		format
+		review {
+			...ReviewOverview
+		}
+		movie {
+			...MovieOverview
+		}
+	}
 }

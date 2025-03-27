@@ -1,0 +1,29 @@
+mutation UpdateUser($displayName: String, $imageUrl: String, $username: String!)
+@auth(level: USER) {
+	user_upsert(
+		data: {
+			uid_expr: "auth.uid"
+			displayName: $displayName
+			imageUrl: $imageUrl
+			username: $username
+		}
+	)
+}
+
+mutation AddWatch($movieId: String!, $format: String, $watchDate: Date)
+@auth(level: USER) {
+	watch_insert(
+		data: {
+			movieId: $movieId
+			userUid_expr: "auth.uid"
+			format: $format
+			watchDate: $watchDate
+		}
+	)
+}
+
+mutation DeleteWatch($watchId: UUID!) @auth(level: USER) {
+	watch_delete(
+		first: { where: { userUid: { eq_expr: "auth.uid" }, id: { eq: $watchId } } }
+	)
+}

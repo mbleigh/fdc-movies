@@ -89,3 +89,61 @@ query WatchHistoryPage($limit: Int) @auth(level: USER) {
 		}
 	}
 }
+
+
+# Return a filtered of movies based on criteria
+query BrowseMovies(
+	# partial title to match - omit for all titles
+	$partialTitle: String
+	# earliest acceptable release date - omit for no lower bound
+	$minDate: Date
+	# latest acceptable release date - omit for no upper bound
+	$maxDate: Date
+	# lowest acceptable average rating for the movie, on a scale from 0.0 to 10.0
+	$minRating: Float
+	# array of acceptable ratings for the movie, such as ["G", "PG"] for family-friendly movies. omit for all ratings
+	$ratings: [String!]
+	# genres to allow results from. omit for all genres
+	$genres: [String!]
+) @auth(level: PUBLIC) {
+	movies(
+		where: {
+			title: { contains: $partialTitle }
+			releaseDate: { ge: $minDate, le: $maxDate }
+			rating: { in: $ratings }
+			genre: { in: $genres }
+			movieStats_on_movie: { avgRating: { ge: $minRating } }
+		}
+		limit: 30
+		orderBy: [{releaseDate: DESC}]
+	) {
+		...MovieOverview
+	}
+}
+
+query GetMovies($ids: [String!]) @auth(level: PUBLIC) {
+	movies(where: {id: {in: $ids}}) {
+		...MovieOverview
+	}
+}
+
+query DetailedWatchHistory @auth(level: USER) {
+	watches(
+		where: { userUid: { eq_expr: "auth.uid" } }
+		orderBy: [{ watchDate: DESC }]
+	) {
+		id
+		watchDate
+		format
+		review {
+			...ReviewOverview
+		}
+		movie {
+			...MovieOverview
+			description
+			actors: actors_via_Role {
+				name, id
+			}
+		}
+	}
+}

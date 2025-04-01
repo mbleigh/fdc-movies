@@ -6,75 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { MovieRecommendation } from "@/components/movie-recommendation";
+import { MovieRecommendationsDisplay } from "@/components/movie-recommendations-display";
 import { ClarifyingQuestion } from "@/components/clarifying-question";
-import {
-	Carousel,
-	CarouselContent,
-	CarouselItem,
-	CarouselNext,
-	CarouselPrevious,
-} from "@/components/ui/carousel";
 import { HomePageData } from "@app/data";
 import MoviePoster from "./movie-poster";
-
-// Dummy data
-const SUGGESTED_IDEAS = [
-	"Something scary",
-	"Family friendly",
-	"Sci-fi classic",
-	"New releases",
-	"90s comedy",
-];
-
-const DUMMY_RECOMMENDATIONS = [
-	{
-		id: 1,
-		title: "The Matrix",
-		year: 1999,
-		description: "A computer hacker learns about the true nature of reality.",
-		image: "https://picsum.photos/seed/matrix/300/300",
-	},
-	{
-		id: 2,
-		title: "Inception",
-		year: 2010,
-		description: "A thief who enters people's dreams to steal their secrets.",
-		image: "https://picsum.photos/seed/inception/300/300",
-	},
-	{
-		id: 3,
-		title: "Interstellar",
-		year: 2014,
-		description:
-			"Explorers travel through a wormhole in space in an attempt to save humanity.",
-		image: "https://picsum.photos/seed/interstellar/300/300",
-	},
-	{
-		id: 4,
-		title: "The Dark Knight",
-		year: 2008,
-		description:
-			"Batman faces off against the Joker in a battle for Gotham City.",
-		image: "https://picsum.photos/seed/darkknight/300/300",
-	},
-	{
-		id: 5,
-		title: "Pulp Fiction",
-		year: 1994,
-		description:
-			"The lives of two mob hitmen, a boxer, and a pair of diner bandits intertwine.",
-		image: "https://picsum.photos/seed/pulpfiction/300/300",
-	},
-	{
-		id: 6,
-		title: "The Shawshank Redemption",
-		year: 1994,
-		description:
-			"Two imprisoned men bond over a number of years, finding solace and eventual redemption.",
-		image: "https://picsum.photos/seed/shawshank/300/300",
-	},
-];
+import type { MessageData } from "genkit";
+import { runFlow } from "genkit/beta/client";
+import { auth } from "@/lib/firebase";
+import { Fireworks } from "@fireworks-js/react";
 
 // Import types from clarifying-question
 interface QuestionBase {
@@ -94,42 +33,343 @@ interface FreeformQuestion extends QuestionBase {
 
 type Question = MultipleChoiceQuestion | FreeformQuestion;
 
-const CLARIFYING_QUESTIONS: Question[] = [
-	{
-		id: 1,
-		question: "What mood are you in today?",
-		type: "multiple-choice",
-		options: ["Happy", "Thoughtful", "Excited", "Relaxed"],
-	},
-	{
-		id: 2,
-		question: "Do you prefer newer movies or classics?",
-		type: "multiple-choice",
-		options: [
-			"New releases only",
-			"Last 10 years",
-			"Classics only",
-			"No preference",
-		],
-	},
-	{
-		id: 3,
-		question: "Any actors or directors you particularly enjoy?",
-		type: "freeform",
-	},
+// Define suggested ideas for the input stage
+const SUGGESTED_IDEAS = [
+	"Something scary",
+	"Family friendly",
+	"Sci-fi classic",
+	"New releases",
+	"90s comedy",
 ];
 
-type Stage = "input" | "recommendations" | "clarifying";
+// Update Stage type to include loading and selected states
+type Stage =
+	| "input"
+	| "recommendations"
+	| "clarifying"
+	| "loading"
+	| "selected";
+
+// Loading state component with animated sayings
+function LoadingState() {
+	// Array of funny loading quotes
+	const loadingSayings = [
+		"Rubbing elbows with celebrities",
+		"Watching movies on 23 screens at once",
+		"Arguing with film critics",
+		"Digging through the archives",
+		"Popping fresh popcorn",
+		"Interviewing fictional characters",
+		"Bribing the Academy for insider info",
+		"Scanning through director's cuts",
+		"Rewinding VHS tapes",
+		"Calculating the perfect movie-to-snack ratio",
+		"Consulting with retired stunt doubles",
+		"Decoding secret movie Easter eggs",
+		"Analyzing plot twists and character arcs",
+		"Checking if that one actor is in this movie",
+		"Debating whether the book was better",
+		"Counting Wilhelm screams",
+		"Measuring the scientific accuracy of sci-fi films",
+		"Calculating the probability of surviving horror scenarios",
+		"Determining the exact shade of lightsaber blue",
+		"Translating alien languages",
+		"Checking if dogs survive in these movies",
+		"Measuring the physics of impossible action scenes",
+		"Counting the number of explosions per minute",
+		"Analyzing the historical accuracy of period pieces",
+		"Calculating how many cups of coffee were consumed on set",
+	];
+
+	// Randomize the order of sayings on component mount
+	const [randomizedSayings, setRandomizedSayings] = useState<string[]>([]);
+	const [currentSayingIndex, setCurrentSayingIndex] = useState(0);
+
+	// Randomize sayings on mount
+	useEffect(() => {
+		// Fisher-Yates shuffle algorithm
+		const shuffleArray = (array: string[]) => {
+			const newArray = [...array];
+			for (let i = newArray.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+			}
+			return newArray;
+		};
+
+		setRandomizedSayings(shuffleArray(loadingSayings));
+	}, []);
+
+	// Use useEffect to cycle through sayings
+	useEffect(() => {
+		if (randomizedSayings.length === 0) return;
+
+		const interval = setInterval(() => {
+			setCurrentSayingIndex((prev) => (prev + 1) % randomizedSayings.length);
+		}, 3000); // Change every 3 seconds
+
+		return () => clearInterval(interval);
+	}, [randomizedSayings]);
+
+	return (
+		<div className="flex flex-col items-center justify-center space-y-6">
+			<div className="relative w-16 h-16">
+				{/* Loading spinner animation */}
+				<div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+			</div>
+
+			{/* AnimatePresence for the saying transitions */}
+			<AnimatePresence mode="wait">
+				<motion.p
+					key={currentSayingIndex}
+					initial={{ opacity: 0, x: 50 }} // Start from right
+					animate={{ opacity: 1, x: 0 }} // Fade in and slide to position
+					exit={{ opacity: 0, x: -50 }} // Exit to left
+					transition={{
+						type: "spring",
+						stiffness: 300,
+						damping: 30,
+						mass: 1,
+					}}
+					className="text-lg font-medium text-center min-h-[28px]"
+				>
+					{randomizedSayings[currentSayingIndex] || "Loading..."}
+				</motion.p>
+			</AnimatePresence>
+		</div>
+	);
+}
 
 export function MovieRecommender({
 	recentMovies,
 }: { recentMovies?: HomePageData["newReleases"] }) {
-	const [stage, setStage] = useState<Stage>("input");
 	const [prompt, setPrompt] = useState("");
-	const [recommendations, setRecommendations] = useState(DUMMY_RECOMMENDATIONS);
-	const [clarifyingQuestions, setClarifyingQuestions] =
-		useState(CLARIFYING_QUESTIONS);
 	const [answers, setAnswers] = useState<Record<number, string>>({});
+	const [messages, setMessages] = useState<MessageData[]>([]);
+	const [selectedMovie, setSelectedMovie] = useState<{
+		movie: any;
+		reason?: string;
+	} | null>(null);
+
+	// Helper function to determine the current stage based on messages and selected movie
+	function determineStage(messages: MessageData[]): Stage {
+		// If a movie is selected, show the selected stage
+		if (selectedMovie) return "selected";
+
+		if (messages.length === 0) return "input";
+
+		const lastMessage = messages[messages.length - 1];
+
+		// If last message is from user or tool, show loading state
+		if (["user", "tool"].includes(lastMessage.role)) return "loading";
+
+		// Check for toolRequest in the content array
+		for (const contentItem of lastMessage.content) {
+			if ("toolRequest" in contentItem && contentItem.toolRequest) {
+				if (contentItem.toolRequest.name === "recommendMovies")
+					return "recommendations";
+				if (contentItem.toolRequest.name === "askQuestion") return "clarifying";
+			}
+		}
+
+		// Default fallback
+		return "input";
+	}
+
+	// Handle selecting a movie
+	const handleSelectMovie = (movie: any, reason?: string) => {
+		setSelectedMovie({ movie, reason });
+	};
+
+	// Extract recommendations from messages
+	function extractRecommendations(messages: MessageData[]) {
+		// Look for toolResponse with name "recommendMovies"
+		for (let i = messages.length - 1; i >= 0; i--) {
+			const message = messages[i];
+			for (const contentItem of message.content) {
+				if (
+					"toolResponse" in contentItem &&
+					contentItem.toolResponse &&
+					contentItem.toolResponse.name === "recommendMovies"
+				) {
+					return contentItem.toolResponse.output as any[];
+				}
+			}
+		}
+		return [];
+	}
+
+	// Extract questions from messages
+	function extractQuestions(messages: MessageData[]): Question[] {
+		// Look for the most recent message with a toolRequest for askQuestion
+		for (let i = messages.length - 1; i >= 0; i--) {
+			const message = messages[i];
+			for (const contentItem of message.content) {
+				// Check for toolRequest with name "askQuestion"
+				if (
+					"toolRequest" in contentItem &&
+					contentItem.toolRequest &&
+					contentItem.toolRequest.name === "askQuestion"
+				) {
+					const input = contentItem.toolRequest.input as {
+						type: string;
+						question: string;
+						choices?: string[];
+					};
+
+					// Convert the toolRequest input to our Question format
+					if (input.type === "MULTIPLE_CHOICE") {
+						return [
+							{
+								id: Date.now(), // Generate a unique ID
+								question: input.question,
+								type: "multiple-choice",
+								options: input.choices || [],
+							} as MultipleChoiceQuestion,
+						];
+					} else {
+						return [
+							{
+								id: Date.now(), // Generate a unique ID
+								question: input.question,
+								type: "freeform",
+							} as FreeformQuestion,
+						];
+					}
+				}
+
+				// Also check for toolResponse with name "askQuestion" (for backward compatibility)
+				if (
+					"toolResponse" in contentItem &&
+					contentItem.toolResponse &&
+					contentItem.toolResponse.name === "askQuestion"
+				) {
+					return contentItem.toolResponse.output as Question[];
+				}
+			}
+		}
+		return [];
+	}
+
+	// Consolidated function to send messages to the recommender API
+	async function sendMessages(newMessages: MessageData[]) {
+		try {
+			// Get auth token
+			const token = await auth.currentUser?.getIdToken();
+
+			// Call the agent
+			const response = await runFlow({
+				url: "/api/recommender",
+				input: { messages: newMessages },
+				headers: token
+					? {
+							authorization: `Bearer ${token}`,
+						}
+					: undefined,
+			});
+
+			// Update messages with agent response
+			setMessages((prev) => [...prev, ...response]);
+		} catch (error) {
+			console.error("Error calling recommender:", error);
+		}
+	}
+
+	async function handleSubmit(data: FormData) {
+		if (!data.get("message")?.toString()) return;
+		const userMessage = data.get("message")!.toString();
+		const newMessages: MessageData[] = [
+			...messages,
+			{ role: "user", content: [{ text: userMessage }] },
+		];
+		setMessages(newMessages);
+		setPrompt("");
+
+		// Call the consolidated function
+		await sendMessages(newMessages);
+	}
+
+	// Handle question answers
+	const handleQuestionAnswer = async (questionId: number, answer: string) => {
+		setAnswers((prev) => ({ ...prev, [questionId]: answer }));
+
+		// Find the ref from the original askQuestion toolRequest
+		let ref = "0"; // Default ref if not found
+		for (let i = messages.length - 1; i >= 0; i--) {
+			const message = messages[i];
+			for (const contentItem of message.content) {
+				if (
+					"toolRequest" in contentItem &&
+					contentItem.toolRequest &&
+					contentItem.toolRequest.name === "askQuestion" &&
+					contentItem.toolRequest.ref
+				) {
+					ref = contentItem.toolRequest.ref;
+					break;
+				}
+			}
+			if (ref !== "0") break; // Stop if we found a ref
+		}
+
+		// Create a new message with the answer as a tool response
+		const newMessages: MessageData[] = [
+			...messages,
+			{
+				role: "tool",
+				content: [
+					{
+						toolResponse: {
+							name: "askQuestion",
+							ref: ref,
+							output: answer,
+						},
+					},
+				],
+			},
+		];
+		setMessages(newMessages);
+
+		// Call the consolidated function
+		await sendMessages(newMessages);
+	};
+
+	// Handle suggestion clicks
+	const handleSuggestionClick = (suggestion: string) => {
+		setPrompt(suggestion);
+
+		// Create a form and submit it
+		const formData = new FormData();
+		formData.append("message", suggestion);
+		handleSubmit(formData);
+	};
+
+	// Handle refinement input
+	const handleRefinement = async (refinementText: string) => {
+		// Create a new message with the refinement
+		const newMessages: MessageData[] = [
+			...messages,
+			{ role: "user", content: [{ text: refinementText }] },
+		];
+		setMessages(newMessages);
+
+		// Call the consolidated function
+		await sendMessages(newMessages);
+	};
+
+	// Reset the flow
+	const resetFlow = () => {
+		setMessages([]);
+		setPrompt("");
+		setAnswers({});
+	};
+
+	// Get current stage
+	console.log("stage:", determineStage(messages));
+	const currentStage = determineStage(messages);
+
+	// Get recommendations and questions from messages
+	const recommendations = extractRecommendations(messages);
+	const clarifyingQuestions = extractQuestions(messages);
 
 	// Transition configurations for Framer Motion
 	const transition = {
@@ -178,63 +418,55 @@ export function MovieRecommender({
 		}),
 	};
 
-	// Simple stage transition function
-	const transitionToStage = (newStage: Stage) => {
-		setStage(newStage);
+	// Recommendation animation variants
+	const recommendationVariants = {
+		hidden: { opacity: 0, x: 100 },
+		visible: (custom: number) => ({
+			opacity: 1,
+			x: 0,
+			transition: {
+				delay: custom * 0.2,
+				duration: 0.5,
+				type: "spring",
+				stiffness: 300,
+				damping: 30,
+			},
+		}),
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-
-		if (!prompt.trim()) return;
-
-		// Randomly decide whether to show recommendations or clarifying questions
-		// In a real implementation, this would be based on AI response
-		const showRecommendations = Math.random() > 0.5;
-
-		if (showRecommendations) {
-			transitionToStage("recommendations");
-		} else {
-			transitionToStage("clarifying");
-		}
-	};
-
-	const handleSuggestionClick = (suggestion: string) => {
-		setPrompt(suggestion);
-		// Simulate processing
-		setTimeout(() => {
-			transitionToStage("recommendations");
-		}, 300);
-	};
-
-	const handleQuestionAnswer = (questionId: number, answer: string) => {
-		setAnswers((prev) => ({ ...prev, [questionId]: answer }));
-
-		// If all questions are answered, show recommendations
-		if (Object.keys(answers).length === clarifyingQuestions.length - 1) {
-			setTimeout(() => {
-				transitionToStage("recommendations");
-			}, 500);
-		}
-	};
-
-	const handleRefinement = (refinementText: string) => {
-		// In a real app, this would send the refinement to the AI
-		// For now, just shuffle the recommendations
-		setRecommendations([...recommendations].sort(() => Math.random() - 0.5));
-	};
-
-	const resetFlow = () => {
-		transitionToStage("input");
-		setPrompt("");
-		setAnswers({});
+	// Fireworks options
+	const fireworksOptions = {
+		opacity: 0.5,
+		acceleration: 1.05,
+		friction: 0.97,
+		gravity: 1.5,
+		particles: 50,
+		explosion: 5,
+		intensity: 30,
+		traceLength: 3,
+		traceSpeed: 10,
+		flickering: 50,
+		lineWidth: {
+			explosion: {
+				min: 1,
+				max: 3,
+			},
+			trace: {
+				min: 1,
+				max: 2,
+			},
+		},
+		hue: {
+			min: 0,
+			max: 360,
+		},
 	};
 
 	return (
 		<div className="min-h-[80vh] flex items-center justify-center">
 			<div className="max-w-3xl mx-auto w-full relative">
 				<AnimatePresence mode="wait">
-					{stage === "input" && (
+					{currentStage === "input" && (
 						<motion.div
 							key="input-stage"
 							className="space-y-6"
@@ -252,12 +484,13 @@ export function MovieRecommender({
 										<MoviePoster movie={movie} size="small" variant="minimal" />
 									</div>
 								))}
-								<div className="aspect-[3/4] border-2 animate-pulse rounded border-accent bg-gradient-to-b from-accent/10 to-secondary/80"></div>
+								<div className="aspect-[3/4] border-2 dark:border-amber-200 border-amber-400 rounded-lg"></div>
 								<div className="absolute top-0 left-0 right-1/4 bottom-0 bg-gradient-to-l from-transparent to-background"></div>
 							</div>
 
-							<form onSubmit={handleSubmit} className="space-y-4">
+							<form action={handleSubmit} className="space-y-4">
 								<Input
+									name="message"
 									placeholder="What do you want to watch tonight?"
 									value={prompt}
 									onChange={(e) => setPrompt(e.target.value)}
@@ -294,7 +527,20 @@ export function MovieRecommender({
 						</motion.div>
 					)}
 
-					{stage === "clarifying" && (
+					{currentStage === "loading" && (
+						<motion.div
+							key="loading-stage"
+							className="space-y-8"
+							initial="hidden"
+							animate="visible"
+							exit="exit"
+							variants={stageVariants}
+						>
+							<LoadingState />
+						</motion.div>
+					)}
+
+					{currentStage === "clarifying" && (
 						<motion.div
 							key="clarifying-stage"
 							className="space-y-8"
@@ -312,92 +558,132 @@ export function MovieRecommender({
 							</h2>
 
 							<div className="space-y-6">
-								{clarifyingQuestions.map((question, index) => (
-									<motion.div
-										key={question.id}
-										variants={itemVariants}
-										initial="hidden"
-										animate="visible"
-										custom={index} // Used for staggered animations
-									>
-										<ClarifyingQuestion
-											question={question}
-											answer={answers[question.id] || ""}
-											onAnswer={(answer) =>
-												handleQuestionAnswer(question.id, answer)
-											}
-										/>
-									</motion.div>
-								))}
+								{clarifyingQuestions && clarifyingQuestions.length > 0 ? (
+									clarifyingQuestions.map((question, index) => (
+										<motion.div
+											key={question.id}
+											variants={itemVariants}
+											initial="hidden"
+											animate="visible"
+											custom={index} // Used for staggered animations
+										>
+											<ClarifyingQuestion
+												question={question}
+												answer={answers[question.id] || ""}
+												onAnswer={(answer) =>
+													handleQuestionAnswer(question.id, answer)
+												}
+											/>
+										</motion.div>
+									))
+								) : (
+									<p>No questions available at the moment.</p>
+								)}
 							</div>
 						</motion.div>
 					)}
 
-					{stage === "recommendations" && (
+					{currentStage === "recommendations" && (
 						<motion.div
 							key="recommendations-stage"
-							className="space-y-8"
 							initial="hidden"
 							animate="visible"
 							exit="exit"
 							variants={stageVariants}
 						>
-							<Button variant="ghost" className="mb-4" onClick={resetFlow}>
-								← Start over
-							</Button>
+							{/* Extract the recommendedMovies from the toolRequest */}
+							{(() => {
+								// Find the recommendMovies toolRequest in the messages
+								for (let i = messages.length - 1; i >= 0; i--) {
+									const message = messages[i];
+									for (const contentItem of message.content) {
+										if (
+											"toolRequest" in contentItem &&
+											contentItem.toolRequest &&
+											contentItem.toolRequest.name === "recommendMovies"
+										) {
+											// Extract the recommendedMovies from the input
+											const input = contentItem.toolRequest.input as {
+												recommendedMovies: Array<{
+													id: string;
+													reason: string;
+												}>;
+											};
 
-							<h2 className="text-xl font-semibold">
-								Here are some movies you might enjoy:
-							</h2>
-
-							<Carousel
-								opts={{
-									align: "start",
-								}}
-								className="w-[640px] mx-auto"
-							>
-								<CarouselContent>
-									{recommendations.slice(0, 2).map((movie, index) => (
-										<CarouselItem
-											key={movie.id}
-											className="md:basis-1/3 sm:basis-1/2 basis-full"
-										>
-											<motion.div
-												className="flex justify-center"
-												variants={itemVariants}
-												initial="hidden"
-												animate="visible"
-												custom={index} // Used for staggered animations
-											>
-												<MovieRecommendation movie={movie} />
-											</motion.div>
-										</CarouselItem>
-									))}
-								</CarouselContent>
-								<div className="flex justify-center mt-4">
-									<CarouselPrevious className="mr-2" />
-									<CarouselNext className="" />
-								</div>
-							</Carousel>
-
-							<Card className="p-4 mt-4">
-								<h3 className="text-lg font-medium mb-2">
-									Want something different?
-								</h3>
-								<Input
-									placeholder="Tell us more about what you're looking for..."
-									className="mb-2"
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											handleRefinement((e.target as HTMLInputElement).value);
-											(e.target as HTMLInputElement).value = "";
+											return (
+												<MovieRecommendationsDisplay
+													recommendedMovies={input.recommendedMovies}
+													onRefinement={handleRefinement}
+													onReset={resetFlow}
+													onSelectMovie={handleSelectMovie}
+												/>
+											);
 										}
+									}
+								}
+
+								// Fallback if no recommendMovies toolRequest is found
+								return <p>No recommendations available at the moment.</p>;
+							})()}
+						</motion.div>
+					)}
+
+					{currentStage === "selected" && selectedMovie && (
+						<motion.div
+							key="selected-stage"
+							className="relative"
+							initial="hidden"
+							animate="visible"
+							exit="exit"
+							variants={stageVariants}
+						>
+							{/* Fireworks background */}
+							<div className="absolute inset-0 overflow-hidden">
+								<Fireworks
+									options={fireworksOptions}
+									style={{
+										top: 0,
+										left: 0,
+										width: "100%",
+										height: "100%",
+										position: "absolute",
+										background: "transparent",
+										zIndex: 1,
 									}}
 								/>
-								<p className="text-sm text-muted-foreground">
-									Press Enter to refine your recommendations
-								</p>
-							</Card>
+							</div>
+
+							<div className="relative z-10 flex flex-col items-center">
+								<Button
+									variant="ghost"
+									className="self-start mb-4"
+									onClick={() => setSelectedMovie(null)}
+								>
+									← Back to recommendations
+								</Button>
+
+								<div className="w-64 mx-auto">
+									<MoviePoster
+										movie={selectedMovie.movie}
+										size="medium"
+										variant="default"
+									/>
+								</div>
+
+								<div className="mt-6 text-center">
+									<h2 className="text-2xl font-bold">
+										{selectedMovie.movie.title}
+									</h2>
+									<p className="text-lg mt-2">
+										Great choice! Enjoy your movie!
+									</p>
+									{selectedMovie.reason && (
+										<p className="mt-4 text-muted-foreground italic">
+											"{selectedMovie.reason}"
+										</p>
+									)}
+								</div>
+							</div>
 						</motion.div>
 					)}
 				</AnimatePresence>
@@ -405,7 +691,7 @@ export function MovieRecommender({
 				{/* Height transition div */}
 				<motion.div
 					animate={{
-						height: stage === "input" ? 240 : 550,
+						height: currentStage === "input" ? 240 : 550,
 					}}
 					transition={{
 						type: "spring",

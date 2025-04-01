@@ -7,9 +7,13 @@
   - [*SearchMovies*](#searchmovies)
   - [*MoviePage*](#moviepage)
   - [*WatchHistoryPage*](#watchhistorypage)
+  - [*BrowseMovies*](#browsemovies)
+  - [*GetMovies*](#getmovies)
+  - [*DetailedWatchHistory*](#detailedwatchhistory)
 - [**Mutations**](#mutations)
   - [*UpdateUser*](#updateuser)
   - [*AddWatch*](#addwatch)
+  - [*AddReview*](#addreview)
   - [*DeleteWatch*](#deletewatch)
 
 # Generated TypeScript README
@@ -565,6 +569,352 @@ executeQuery(ref).then((response) => {
 });
 ```
 
+## BrowseMovies
+You can execute the `BrowseMovies` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [data/index.d.ts](./index.d.ts):
+```javascript
+browseMovies(vars?: BrowseMoviesVariables): QueryPromise<BrowseMoviesData, BrowseMoviesVariables>;
+
+browseMoviesRef(vars?: BrowseMoviesVariables): QueryRef<BrowseMoviesData, BrowseMoviesVariables>;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```javascript
+browseMovies(dc: DataConnect, vars?: BrowseMoviesVariables): QueryPromise<BrowseMoviesData, BrowseMoviesVariables>;
+
+browseMoviesRef(dc: DataConnect, vars?: BrowseMoviesVariables): QueryRef<BrowseMoviesData, BrowseMoviesVariables>;
+```
+
+### Variables
+The `BrowseMovies` query has an optional argument of type `BrowseMoviesVariables`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
+
+```javascript
+export interface BrowseMoviesVariables {
+  partialTitle?: string | null;
+  minDate?: DateString | null;
+  maxDate?: DateString | null;
+  minRating?: number | null;
+  ratings?: string[] | null;
+  genres?: string[] | null;
+}
+```
+### Return Type
+Recall that executing the `BrowseMovies` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `BrowseMoviesData`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
+```javascript
+export interface BrowseMoviesData {
+  movies: ({
+    id: string;
+    rating: string;
+    title: string;
+    posterUrl: string;
+    genre: string;
+    releaseDate: DateString;
+    stats?: {
+      watchCount?: number | null;
+      reviewCount?: number | null;
+      avgRating?: number | null;
+    };
+  } & Movie_Key)[];
+}
+```
+### Using `BrowseMovies`'s action shortcut function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig, browseMovies, BrowseMoviesVariables } from '@app/data';
+
+// The `BrowseMovies` query has an optional argument of type `BrowseMoviesVariables`:
+const browseMoviesVars: BrowseMoviesVariables = {
+  partialTitle: ..., // optional
+  minDate: ..., // optional
+  maxDate: ..., // optional
+  minRating: ..., // optional
+  ratings: ..., // optional
+  genres: ..., // optional
+};
+
+// Call the `browseMovies()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await browseMovies(browseMoviesVars);
+// Variables can be defined inline as well.
+const { data } = await browseMovies({ partialTitle: ..., minDate: ..., maxDate: ..., minRating: ..., ratings: ..., genres: ..., });
+// Since all variables are optional for this query, you can omit the `BrowseMoviesVariables` argument.
+const { data } = await browseMovies();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await browseMovies(dataConnect, browseMoviesVars);
+
+console.log(data.movies);
+
+// Or, you can use the `Promise` API.
+browseMovies(browseMoviesVars).then((response) => {
+  const data = response.data;
+  console.log(data.movies);
+});
+```
+
+### Using `BrowseMovies`'s `QueryRef` function
+
+```javascript
+import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, browseMoviesRef, BrowseMoviesVariables } from '@app/data';
+
+// The `BrowseMovies` query has an optional argument of type `BrowseMoviesVariables`:
+const browseMoviesVars: BrowseMoviesVariables = {
+  partialTitle: ..., // optional
+  minDate: ..., // optional
+  maxDate: ..., // optional
+  minRating: ..., // optional
+  ratings: ..., // optional
+  genres: ..., // optional
+};
+
+// Call the `browseMoviesRef()` function to get a reference to the query.
+const ref = browseMoviesRef(browseMoviesVars);
+// Variables can be defined inline as well.
+const ref = browseMoviesRef({ partialTitle: ..., minDate: ..., maxDate: ..., minRating: ..., ratings: ..., genres: ..., });
+// Since all variables are optional for this query, you can omit the `BrowseMoviesVariables` argument.
+const ref = browseMoviesRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = browseMoviesRef(dataConnect, browseMoviesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.movies);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.movies);
+});
+```
+
+## GetMovies
+You can execute the `GetMovies` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [data/index.d.ts](./index.d.ts):
+```javascript
+getMovies(vars?: GetMoviesVariables): QueryPromise<GetMoviesData, GetMoviesVariables>;
+
+getMoviesRef(vars?: GetMoviesVariables): QueryRef<GetMoviesData, GetMoviesVariables>;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```javascript
+getMovies(dc: DataConnect, vars?: GetMoviesVariables): QueryPromise<GetMoviesData, GetMoviesVariables>;
+
+getMoviesRef(dc: DataConnect, vars?: GetMoviesVariables): QueryRef<GetMoviesData, GetMoviesVariables>;
+```
+
+### Variables
+The `GetMovies` query has an optional argument of type `GetMoviesVariables`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
+
+```javascript
+export interface GetMoviesVariables {
+  ids?: string[] | null;
+}
+```
+### Return Type
+Recall that executing the `GetMovies` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetMoviesData`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
+```javascript
+export interface GetMoviesData {
+  movies: ({
+    id: string;
+    rating: string;
+    title: string;
+    posterUrl: string;
+    genre: string;
+    releaseDate: DateString;
+    stats?: {
+      watchCount?: number | null;
+      reviewCount?: number | null;
+      avgRating?: number | null;
+    };
+  } & Movie_Key)[];
+}
+```
+### Using `GetMovies`'s action shortcut function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig, getMovies, GetMoviesVariables } from '@app/data';
+
+// The `GetMovies` query has an optional argument of type `GetMoviesVariables`:
+const getMoviesVars: GetMoviesVariables = {
+  ids: ..., // optional
+};
+
+// Call the `getMovies()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getMovies(getMoviesVars);
+// Variables can be defined inline as well.
+const { data } = await getMovies({ ids: ..., });
+// Since all variables are optional for this query, you can omit the `GetMoviesVariables` argument.
+const { data } = await getMovies();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getMovies(dataConnect, getMoviesVars);
+
+console.log(data.movies);
+
+// Or, you can use the `Promise` API.
+getMovies(getMoviesVars).then((response) => {
+  const data = response.data;
+  console.log(data.movies);
+});
+```
+
+### Using `GetMovies`'s `QueryRef` function
+
+```javascript
+import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getMoviesRef, GetMoviesVariables } from '@app/data';
+
+// The `GetMovies` query has an optional argument of type `GetMoviesVariables`:
+const getMoviesVars: GetMoviesVariables = {
+  ids: ..., // optional
+};
+
+// Call the `getMoviesRef()` function to get a reference to the query.
+const ref = getMoviesRef(getMoviesVars);
+// Variables can be defined inline as well.
+const ref = getMoviesRef({ ids: ..., });
+// Since all variables are optional for this query, you can omit the `GetMoviesVariables` argument.
+const ref = getMoviesRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getMoviesRef(dataConnect, getMoviesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.movies);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.movies);
+});
+```
+
+## DetailedWatchHistory
+You can execute the `DetailedWatchHistory` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [data/index.d.ts](./index.d.ts):
+```javascript
+detailedWatchHistory(): QueryPromise<DetailedWatchHistoryData, undefined>;
+
+detailedWatchHistoryRef(): QueryRef<DetailedWatchHistoryData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```javascript
+detailedWatchHistory(dc: DataConnect): QueryPromise<DetailedWatchHistoryData, undefined>;
+
+detailedWatchHistoryRef(dc: DataConnect): QueryRef<DetailedWatchHistoryData, undefined>;
+```
+
+### Variables
+The `DetailedWatchHistory` query has no variables.
+### Return Type
+Recall that executing the `DetailedWatchHistory` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DetailedWatchHistoryData`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
+```javascript
+export interface DetailedWatchHistoryData {
+  watches: ({
+    id: UUIDString;
+    watchDate: DateString;
+    format?: string | null;
+    review?: {
+      id: UUIDString;
+      user: {
+        username: string;
+      };
+        rating: number;
+        review?: string | null;
+        reviewTime: TimestampString;
+        watch?: {
+          watchDate: DateString;
+          format?: string | null;
+        };
+    } & Review_Key;
+      movie: {
+        id: string;
+        rating: string;
+        title: string;
+        posterUrl: string;
+        genre: string;
+        releaseDate: DateString;
+        stats?: {
+          watchCount?: number | null;
+          reviewCount?: number | null;
+          avgRating?: number | null;
+        };
+          description?: string | null;
+          actors: ({
+            name: string;
+            id: string;
+          } & Actor_Key)[];
+      } & Movie_Key;
+  } & Watch_Key)[];
+}
+```
+### Using `DetailedWatchHistory`'s action shortcut function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig, detailedWatchHistory } from '@app/data';
+
+
+// Call the `detailedWatchHistory()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await detailedWatchHistory();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await detailedWatchHistory(dataConnect);
+
+console.log(data.watches);
+
+// Or, you can use the `Promise` API.
+detailedWatchHistory().then((response) => {
+  const data = response.data;
+  console.log(data.watches);
+});
+```
+
+### Using `DetailedWatchHistory`'s `QueryRef` function
+
+```javascript
+import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, detailedWatchHistoryRef } from '@app/data';
+
+
+// Call the `detailedWatchHistoryRef()` function to get a reference to the query.
+const ref = detailedWatchHistoryRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = detailedWatchHistoryRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.watches);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.watches);
+});
+```
+
 # Mutations
 
 There are two ways to execute a Data Connect Mutation using the generated Web SDK:
@@ -610,7 +960,7 @@ Recall that executing the `UpdateUser` mutation returns a `MutationPromise` that
 The `data` property is an object of type `UpdateUserData`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
 ```javascript
 export interface UpdateUserData {
-  user_upsert: User_Key;
+  user: User_Key;
 }
 ```
 ### Using `UpdateUser`'s action shortcut function
@@ -636,12 +986,12 @@ const { data } = await updateUser({ displayName: ..., imageUrl: ..., username: .
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await updateUser(dataConnect, updateUserVars);
 
-console.log(data.user_upsert);
+console.log(data.user);
 
 // Or, you can use the `Promise` API.
 updateUser(updateUserVars).then((response) => {
   const data = response.data;
-  console.log(data.user_upsert);
+  console.log(data.user);
 });
 ```
 
@@ -671,12 +1021,12 @@ const ref = updateUserRef(dataConnect, updateUserVars);
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.user_upsert);
+console.log(data.user);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.user_upsert);
+  console.log(data.user);
 });
 ```
 
@@ -702,6 +1052,7 @@ export interface AddWatchVariables {
   movieId: string;
   format?: string | null;
   watchDate?: DateString | null;
+  reviewId?: UUIDString | null;
 }
 ```
 ### Return Type
@@ -710,7 +1061,7 @@ Recall that executing the `AddWatch` mutation returns a `MutationPromise` that r
 The `data` property is an object of type `AddWatchData`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
 ```javascript
 export interface AddWatchData {
-  watch_insert: Watch_Key;
+  watch: Watch_Key;
 }
 ```
 ### Using `AddWatch`'s action shortcut function
@@ -724,24 +1075,25 @@ const addWatchVars: AddWatchVariables = {
   movieId: ..., 
   format: ..., // optional
   watchDate: ..., // optional
+  reviewId: ..., // optional
 };
 
 // Call the `addWatch()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await addWatch(addWatchVars);
 // Variables can be defined inline as well.
-const { data } = await addWatch({ movieId: ..., format: ..., watchDate: ..., });
+const { data } = await addWatch({ movieId: ..., format: ..., watchDate: ..., reviewId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await addWatch(dataConnect, addWatchVars);
 
-console.log(data.watch_insert);
+console.log(data.watch);
 
 // Or, you can use the `Promise` API.
 addWatch(addWatchVars).then((response) => {
   const data = response.data;
-  console.log(data.watch_insert);
+  console.log(data.watch);
 });
 ```
 
@@ -756,12 +1108,13 @@ const addWatchVars: AddWatchVariables = {
   movieId: ..., 
   format: ..., // optional
   watchDate: ..., // optional
+  reviewId: ..., // optional
 };
 
 // Call the `addWatchRef()` function to get a reference to the mutation.
 const ref = addWatchRef(addWatchVars);
 // Variables can be defined inline as well.
-const ref = addWatchRef({ movieId: ..., format: ..., watchDate: ..., });
+const ref = addWatchRef({ movieId: ..., format: ..., watchDate: ..., reviewId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -771,12 +1124,112 @@ const ref = addWatchRef(dataConnect, addWatchVars);
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.watch_insert);
+console.log(data.watch);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.watch_insert);
+  console.log(data.watch);
+});
+```
+
+## AddReview
+You can execute the `AddReview` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [data/index.d.ts](./index.d.ts):
+```javascript
+addReview(vars: AddReviewVariables): MutationPromise<AddReviewData, AddReviewVariables>;
+
+addReviewRef(vars: AddReviewVariables): MutationRef<AddReviewData, AddReviewVariables>;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```javascript
+addReview(dc: DataConnect, vars: AddReviewVariables): MutationPromise<AddReviewData, AddReviewVariables>;
+
+addReviewRef(dc: DataConnect, vars: AddReviewVariables): MutationRef<AddReviewData, AddReviewVariables>;
+```
+
+### Variables
+The `AddReview` mutation requires an argument of type `AddReviewVariables`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
+
+```javascript
+export interface AddReviewVariables {
+  movieId: string;
+  rating: number;
+  review?: string | null;
+}
+```
+### Return Type
+Recall that executing the `AddReview` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `AddReviewData`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
+```javascript
+export interface AddReviewData {
+  review: Review_Key;
+}
+```
+### Using `AddReview`'s action shortcut function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig, addReview, AddReviewVariables } from '@app/data';
+
+// The `AddReview` mutation requires an argument of type `AddReviewVariables`:
+const addReviewVars: AddReviewVariables = {
+  movieId: ..., 
+  rating: ..., 
+  review: ..., // optional
+};
+
+// Call the `addReview()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await addReview(addReviewVars);
+// Variables can be defined inline as well.
+const { data } = await addReview({ movieId: ..., rating: ..., review: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await addReview(dataConnect, addReviewVars);
+
+console.log(data.review);
+
+// Or, you can use the `Promise` API.
+addReview(addReviewVars).then((response) => {
+  const data = response.data;
+  console.log(data.review);
+});
+```
+
+### Using `AddReview`'s `MutationRef` function
+
+```javascript
+import { getDataConnect, DataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, addReviewRef, AddReviewVariables } from '@app/data';
+
+// The `AddReview` mutation requires an argument of type `AddReviewVariables`:
+const addReviewVars: AddReviewVariables = {
+  movieId: ..., 
+  rating: ..., 
+  review: ..., // optional
+};
+
+// Call the `addReviewRef()` function to get a reference to the mutation.
+const ref = addReviewRef(addReviewVars);
+// Variables can be defined inline as well.
+const ref = addReviewRef({ movieId: ..., rating: ..., review: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = addReviewRef(dataConnect, addReviewVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.review);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.review);
 });
 ```
 
@@ -808,7 +1261,7 @@ Recall that executing the `DeleteWatch` mutation returns a `MutationPromise` tha
 The `data` property is an object of type `DeleteWatchData`, which is defined in [data/index.d.ts](./index.d.ts). It has the following fields:
 ```javascript
 export interface DeleteWatchData {
-  watch_delete?: Watch_Key | null;
+  watch?: Watch_Key | null;
 }
 ```
 ### Using `DeleteWatch`'s action shortcut function
@@ -832,12 +1285,12 @@ const { data } = await deleteWatch({ watchId: ..., });
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await deleteWatch(dataConnect, deleteWatchVars);
 
-console.log(data.watch_delete);
+console.log(data.watch);
 
 // Or, you can use the `Promise` API.
 deleteWatch(deleteWatchVars).then((response) => {
   const data = response.data;
-  console.log(data.watch_delete);
+  console.log(data.watch);
 });
 ```
 
@@ -865,12 +1318,12 @@ const ref = deleteWatchRef(dataConnect, deleteWatchVars);
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.watch_delete);
+console.log(data.watch);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.watch_delete);
+  console.log(data.watch);
 });
 ```
 

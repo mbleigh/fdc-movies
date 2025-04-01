@@ -22,10 +22,12 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import MoviePoster, { Movie } from "@/components/movie-poster";
+import StarRating from "@/components/star-rating";
 import { cn } from "@/lib/utils";
 import { dc } from "@/lib/firebase";
-import { addWatch } from "@app/data";
+import { addReview, addWatch } from "@app/data";
 import { toast } from "sonner";
 
 // Watch format options
@@ -57,6 +59,8 @@ export default function WatchDialog({
 	const [watchDate, setWatchDate] = useState<Date>(new Date());
 	const [watchFormat, setWatchFormat] = useState<string | undefined>(undefined);
 	const [calendarOpen, setCalendarOpen] = useState(false);
+	const [rating, setRating] = useState<number>(0);
+	const [reviewText, setReviewText] = useState<string>("");
 
 	// Handle form submission
 	const handleSubmit = async () => {
@@ -67,11 +71,30 @@ export default function WatchDialog({
 				format: watchFormat,
 			});
 		}
+
+		let reviewId;
+
+		// Only create a review if the user has set a rating
+		if (rating > 0) {
+			// Create the review first
+			const reviewData = await addReview(dc, {
+				movieId: movie.id,
+				rating,
+				review: reviewText.trim() || null,
+			});
+
+			// Extract the review ID from the response
+			reviewId = reviewData.data.review.id;
+		}
+
+		// Then create the watch with the review ID if available
 		await addWatch(dc, {
 			movieId: movie.id,
 			format: watchFormat,
 			watchDate: watchDate.toISOString().substring(0, 10),
+			reviewId: reviewId,
 		});
+
 		toast(`Added '${movie.title}' to your watch history.`);
 		setOpen(false);
 	};
@@ -115,7 +138,7 @@ export default function WatchDialog({
 
 				<div className="flex gap-6">
 					{/* Movie poster */}
-					<div>
+					<div className="w-40">
 						<MoviePoster movie={movie} variant="minimal" size="medium" />
 					</div>
 
@@ -173,6 +196,33 @@ export default function WatchDialog({
 									</Button>
 								))}
 							</div>
+						</div>
+
+						{/* Review section */}
+						<div className="space-y-2 mt-4">
+							<h3 className="text-lg font-medium">Add a review</h3>
+
+							{/* Star rating */}
+							<div className="flex flex-col gap-2 mb-2">
+								<div className="flex items-center bg-primary-foreground/10 rounded-md p-2">
+									<StarRating rating={rating} onRatingChange={setRating} />
+									<span className="text-sm ml-2">
+										{rating > 0
+											? `${rating / 2} out of 5 stars`
+											: "Click to rate"}
+									</span>
+								</div>
+							</div>
+
+							{/* Review text */}
+							<Textarea
+								placeholder="Write your review here..."
+								className="min-h-[100px] resize-none"
+								value={reviewText}
+								onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+									setReviewText(e.target.value)
+								}
+							/>
 						</div>
 					</div>
 				</div>

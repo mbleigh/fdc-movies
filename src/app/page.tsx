@@ -1,4 +1,5 @@
 import MoviePoster from "@/components/movie-poster";
+import MoviePosterPlaceholder from "@/components/movie-poster-placeholder";
 import Review from "@/components/review";
 import { dc } from "@/lib/firebase";
 import { homePage } from "@app/data";

@@ -3,22 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@app/data": "link:generated/data",
+    "@fireworks-js/react": "^2.10.8",
     "@genkit-ai/firebase": "link:../genkit/js/plugins/firebase",
     "@genkit-ai/next": "link:../genkit/js/plugins/next",
     "@genkit-ai/vertexai": "link:../genkit/js/plugins/vertexai",
     "@radix-ui/react-avatar": "^1.1.3",
+    "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-radio-group": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.2",
-    "@tanstack-query-firebase/react": "2.0.0-dev.0",
+    "@tanstack-query-firebase/react": "file:tanstack-query-firebase-react-2.0.8.tgz",
     "@tanstack/react-query": "^5.69.0",
     "@types/react-motion": "^0.0.40",
     "class-variance-authority": "^0.7.1",
@@ -27,8 +30,9 @@
     "embla-carousel-react": "^8.5.2",
     "firebase": "^11.4.0",
     "firebase-admin": "^13.2.0",
+    "fireworks-js": "^2.10.8",
     "framer-motion": "^12.4.11",
-    "genkit": "link:../genkit/js/genkit",
+    "genkit": "^1.4.0",
     "lucide-react": "^0.479.0",
     "next": "15.2.1",
     "next-themes": "^0.4.5",
@@ -51,5 +55,5 @@
     "tsx": "^4.19.3",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@9.15.5+sha256.8472168c3e1fd0bff287e694b053fccbbf20579a3ff9526b6333beab8df65a8d"
+  "packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808"
 }

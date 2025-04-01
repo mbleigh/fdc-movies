@@ -43,8 +43,6 @@ query SearchMovies(
 
 # Return a filtered of movies based on criteria
 query FilterMovies(
-	# partial title to match - omit for all titles
-	$partialTitle: String
 	# earliest acceptable release date - omit for no lower bound
 	$minDate: Date
 	# latest acceptable release date - omit for no upper bound
@@ -58,7 +56,6 @@ query FilterMovies(
 ) @auth(level: PUBLIC) {
 	movies(
 		where: {
-			title: { contains: $partialTitle }
 			releaseDate: { ge: $minDate, le: $maxDate }
 			rating: { in: $ratings }
 			genre: { in: $genres }
@@ -85,7 +82,7 @@ query SearchReviews(
 	$ratings: [String!]
 	# genres to allow results from. omit for all genres
 	$genres: [String!]
-) @auth(level: USER) {
+) @auth(level: PUBLIC) {
 	reviews: reviews_embedding_similarity(
 		compare_embed: { text: $query, model: "text-embedding-005" }
 		where: {

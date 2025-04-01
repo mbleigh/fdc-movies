@@ -1,79 +1,70 @@
 "use client";
 
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { InfoIcon } from "@/components/ui/icons";
 import { Star } from "lucide-react";
-
-interface Movie {
-  id: number;
-  title: string;
-  year: number;
-  description: string;
-  image: string;
-}
+import MoviePoster, { Movie } from "@/components/movie-poster";
 
 interface MovieRecommendationProps {
-  movie: Movie;
+	movie: Movie;
+	reason?: string;
+	onSelectMovie?: (movie: Movie, reason?: string) => void;
 }
 
-export function MovieRecommendation({ movie }: MovieRecommendationProps) {
-  return (
-    <div className="min-w-[200px] w-[200px] overflow-hidden hover:shadow-lg flex flex-col">
-      <div className="relative aspect-[1/1] w-full">
-        <img
-          src={movie.image}
-          alt={movie.title}
-          className="object-cover w-full h-full rounded-xl"
-        />
-        <div className="absolute top-2 right-2">
-          <Badge variant="secondary" className="px-2 py-1 text-xs opacity-90">
-            {movie.year}
-          </Badge>
-        </div>
-        <div className="absolute bottom-2 right-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
-              >
-                <InfoIcon className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-4">
-              <div className="space-y-2">
-                <h3 className="font-medium text-lg">
-                  {movie.title} ({movie.year})
-                </h3>
-                <p className="text-sm text-muted-foreground">{movie.description}</p>
-                <div className="flex flex-wrap gap-1 pt-2">
-                  <Badge>Action</Badge>
-                  <Badge>Sci-Fi</Badge>
-                  <Badge>Thriller</Badge>
-                </div>
-                <div className="pt-2">
-                  <Button size="sm" className="w-full">
-                    Watch Now
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
+export function MovieRecommendation({
+	movie,
+	reason,
+	onSelectMovie,
+}: MovieRecommendationProps) {
+	// Extract release year from the date
+	const releaseYear = new Date(movie.releaseDate).getFullYear();
 
-      <div className="flex p-2">
-        <h3 className="font-medium text-sm flex-1">{movie.title}</h3>
+	return (
+		<div className="flex items-center gap-4 p-4 rounded-lg border border-border hover:shadow-md transition-shadow w-full">
+			{/* Movie Poster */}
+			<div className="w-[120px] flex-shrink-0">
+				<MoviePoster movie={movie} size="small" variant="minimal" />
+			</div>
 
-        <div className="flex items-center text-sm">
-          <Star className="size-[12px] dark:text-yellow-300 text-orange-500 mr-1" />
-          3.2
-        </div>
-      </div>
-    </div>
-  );
+			{/* Recommendation Text */}
+			<div className="flex-1 space-y-2">
+				<h3 className="font-medium text-lg">
+					{movie.title}{" "}
+					<span className="text-muted-foreground">({releaseYear})</span>
+				</h3>
+				<p className="text-sm text-muted-foreground">{reason || movie.genre}</p>
+
+				<div className="flex items-center gap-2">
+					{movie.stats?.avgRating && (
+						<div className="flex items-center text-sm">
+							<Star className="size-[14px] dark:text-yellow-300 text-orange-500 mr-1" />
+							{(movie.stats.avgRating / 2).toFixed(1)}
+						</div>
+					)}
+					<div className="flex flex-wrap gap-1">
+						<Badge variant="outline" className="text-xs">
+							{movie.genre}
+						</Badge>
+						<Badge variant="outline" className="text-xs">
+							{movie.rating}
+						</Badge>
+					</div>
+				</div>
+			</div>
+
+			{/* Watch It Button */}
+			<Button
+				className="flex-shrink-0"
+				onClick={() => onSelectMovie && onSelectMovie(movie, reason)}
+			>
+				Watch It
+			</Button>
+		</div>
+	);
 }

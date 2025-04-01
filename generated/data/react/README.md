@@ -10,9 +10,13 @@
   - [*SearchMovies*](#searchmovies)
   - [*MoviePage*](#moviepage)
   - [*WatchHistoryPage*](#watchhistorypage)
+  - [*BrowseMovies*](#browsemovies)
+  - [*GetMovies*](#getmovies)
+  - [*DetailedWatchHistory*](#detailedwatchhistory)
 - [**Mutations**](#mutations)
   - [*UpdateUser*](#updateuser)
   - [*AddWatch*](#addwatch)
+  - [*AddReview*](#addreview)
   - [*DeleteWatch*](#deletewatch)
 
 # Generated React README
@@ -523,6 +527,283 @@ export default function WatchHistoryPageComponent() {
 }
 ```
 
+## BrowseMovies
+You can execute the `BrowseMovies` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+```javascript
+useBrowseMovies(vars?: BrowseMoviesVariables, options?: useDataConnectQueryOptions<BrowseMoviesData>): UseQueryResult<FlattenedQueryResult<BrowseMoviesData, BrowseMoviesVariables>, FirebaseError>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useBrowseMovies(dc: DataConnect, vars?: BrowseMoviesVariables, options?: useDataConnectQueryOptions<BrowseMoviesData>): UseQueryResult<FlattenedQueryResult<BrowseMoviesData, BrowseMoviesVariables>, FirebaseError>;
+```
+
+### Variables
+The `BrowseMovies` Query requires an argument of type `BrowseMoviesVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface BrowseMoviesVariables {
+  partialTitle?: string | null;
+  minDate?: DateString | null;
+  maxDate?: DateString | null;
+  minRating?: number | null;
+  ratings?: string[] | null;
+  genres?: string[] | null;
+}
+```
+### Return Type
+Recall that calling the `BrowseMovies` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `BrowseMovies` Query is of type `BrowseMoviesData`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface BrowseMoviesData {
+  movies: ({
+    id: string;
+    rating: string;
+    title: string;
+    posterUrl: string;
+    genre: string;
+    releaseDate: DateString;
+    stats?: {
+      watchCount?: number | null;
+      reviewCount?: number | null;
+      avgRating?: number | null;
+    };
+  } & Movie_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `BrowseMovies`'s Query hook function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig, BrowseMoviesVariables } from '@app/data';
+import { useBrowseMovies } from '@app/data/react'
+
+export default function BrowseMoviesComponent() {
+  // The `useBrowseMovies` Query hook requires an argument of type `BrowseMoviesVariables`:
+  const browseMoviesVars: BrowseMoviesVariables = {
+    partialTitle: ..., // optional
+    minDate: ..., // optional
+    maxDate: ..., // optional
+    minRating: ..., // optional
+    ratings: ..., // optional
+    genres: ..., // optional
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useBrowseMovies(browseMoviesVars);
+  // Variables can be defined inline as well.
+  const query = useBrowseMovies({ partialTitle: ..., minDate: ..., maxDate: ..., minRating: ..., ratings: ..., genres: ..., });
+  // Since all variables are optional for this Query, you can omit the `BrowseMoviesVariables` argument.
+  const query = useBrowseMovies();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useBrowseMovies(dataConnect, browseMoviesVars);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.movies);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetMovies
+You can execute the `GetMovies` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+```javascript
+useGetMovies(vars?: GetMoviesVariables, options?: useDataConnectQueryOptions<GetMoviesData>): UseQueryResult<FlattenedQueryResult<GetMoviesData, GetMoviesVariables>, FirebaseError>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetMovies(dc: DataConnect, vars?: GetMoviesVariables, options?: useDataConnectQueryOptions<GetMoviesData>): UseQueryResult<FlattenedQueryResult<GetMoviesData, GetMoviesVariables>, FirebaseError>;
+```
+
+### Variables
+The `GetMovies` Query requires an argument of type `GetMoviesVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetMoviesVariables {
+  ids?: string[] | null;
+}
+```
+### Return Type
+Recall that calling the `GetMovies` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetMovies` Query is of type `GetMoviesData`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetMoviesData {
+  movies: ({
+    id: string;
+    rating: string;
+    title: string;
+    posterUrl: string;
+    genre: string;
+    releaseDate: DateString;
+    stats?: {
+      watchCount?: number | null;
+      reviewCount?: number | null;
+      avgRating?: number | null;
+    };
+  } & Movie_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetMovies`'s Query hook function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetMoviesVariables } from '@app/data';
+import { useGetMovies } from '@app/data/react'
+
+export default function GetMoviesComponent() {
+  // The `useGetMovies` Query hook requires an argument of type `GetMoviesVariables`:
+  const getMoviesVars: GetMoviesVariables = {
+    ids: ..., // optional
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetMovies(getMoviesVars);
+  // Variables can be defined inline as well.
+  const query = useGetMovies({ ids: ..., });
+  // Since all variables are optional for this Query, you can omit the `GetMoviesVariables` argument.
+  const query = useGetMovies();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetMovies(dataConnect, getMoviesVars);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.movies);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## DetailedWatchHistory
+You can execute the `DetailedWatchHistory` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+```javascript
+useDetailedWatchHistory(options?: useDataConnectQueryOptions<DetailedWatchHistoryData>): UseQueryResult<FlattenedQueryResult<DetailedWatchHistoryData, undefined>, FirebaseError>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useDetailedWatchHistory(dc: DataConnect, options?: useDataConnectQueryOptions<DetailedWatchHistoryData>): UseQueryResult<FlattenedQueryResult<DetailedWatchHistoryData, undefined>, FirebaseError>;
+```
+
+### Variables
+The `DetailedWatchHistory` Query has no variables.
+### Return Type
+Recall that calling the `DetailedWatchHistory` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `DetailedWatchHistory` Query is of type `DetailedWatchHistoryData`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface DetailedWatchHistoryData {
+  watches: ({
+    id: UUIDString;
+    watchDate: DateString;
+    format?: string | null;
+    review?: {
+      id: UUIDString;
+      user: {
+        username: string;
+      };
+        rating: number;
+        review?: string | null;
+        reviewTime: TimestampString;
+        watch?: {
+          watchDate: DateString;
+          format?: string | null;
+        };
+    } & Review_Key;
+      movie: {
+        id: string;
+        rating: string;
+        title: string;
+        posterUrl: string;
+        genre: string;
+        releaseDate: DateString;
+        stats?: {
+          watchCount?: number | null;
+          reviewCount?: number | null;
+          avgRating?: number | null;
+        };
+          description?: string | null;
+          actors: ({
+            name: string;
+            id: string;
+          } & Actor_Key)[];
+      } & Movie_Key;
+  } & Watch_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `DetailedWatchHistory`'s Query hook function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@app/data';
+import { useDetailedWatchHistory } from '@app/data/react'
+
+export default function DetailedWatchHistoryComponent() {
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useDetailedWatchHistory();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useDetailedWatchHistory(dataConnect);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.watches);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
 # Mutations
 
 The React generated SDK provides Mutations hook functions that call and return [`useDataConnectMutation`](https://react-query-firebase.invertase.dev/react/data-connect/mutations) hooks from TanStack Query Firebase.
@@ -577,7 +858,7 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateUser` Mutation is of type `UpdateUserData`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface UpdateUserData {
-  user_upsert: User_Key;
+  user: User_Key;
 }
 ```
 
@@ -619,7 +900,7 @@ export default function UpdateUserComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.user_upsert);
+    console.log(mutation.data.user);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -643,6 +924,7 @@ export interface AddWatchVariables {
   movieId: string;
   format?: string | null;
   watchDate?: DateString | null;
+  reviewId?: UUIDString | null;
 }
 ```
 ### Return Type
@@ -655,7 +937,7 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AddWatch` Mutation is of type `AddWatchData`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface AddWatchData {
-  watch_insert: Watch_Key;
+  watch: Watch_Key;
 }
 ```
 
@@ -681,10 +963,11 @@ export default function AddWatchComponent() {
     movieId: ..., 
     format: ..., // optional
     watchDate: ..., // optional
+    reviewId: ..., // optional
   };
   mutation.mutate(addWatchVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ movieId: ..., format: ..., watchDate: ..., });
+  mutation.mutate({ movieId: ..., format: ..., watchDate: ..., reviewId: ..., });
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -697,7 +980,85 @@ export default function AddWatchComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.watch_insert);
+    console.log(mutation.data.watch);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AddReview
+You can execute the `AddReview` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [data/react/index.d.ts](./index.d.ts)):
+```javascript
+useAddReview(options?: useDataConnectMutationOptions<AddReviewData, FirebaseError, AddReviewVariables>): UseMutationResult<FlattenedMutationResult<AddReviewData, AddReviewVariables>, FirebaseError, AddReviewVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAddReview(dc: DataConnect, options?: useDataConnectMutationOptions<AddReviewData, FirebaseError, AddReviewVariables>): UseMutationResult<FlattenedMutationResult<AddReviewData, AddReviewVariables>, FirebaseError, AddReviewVariables>;
+```
+
+### Variables
+The `AddReview` Mutation requires an argument of type `AddReviewVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AddReviewVariables {
+  movieId: string;
+  rating: number;
+  review?: string | null;
+}
+```
+### Return Type
+Recall that calling the `AddReview` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AddReview` Mutation is of type `AddReviewData`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AddReviewData {
+  review: Review_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AddReview`'s Mutation hook function
+
+```javascript
+import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectorConfig, AddReviewVariables } from '@app/data';
+import { useAddReview } from '@app/data/react'
+
+export default function AddReviewComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAddReview();
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAddReview(dataConnect);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAddReview` Mutation requires an argument of type `AddReviewVariables`:
+  const addReviewVars: AddReviewVariables = {
+    movieId: ..., 
+    rating: ..., 
+    review: ..., // optional
+  };
+  mutation.mutate(addReviewVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ movieId: ..., rating: ..., review: ..., });
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.review);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -731,7 +1092,7 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `DeleteWatch` Mutation is of type `DeleteWatchData`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface DeleteWatchData {
-  watch_delete?: Watch_Key | null;
+  watch?: Watch_Key | null;
 }
 ```
 
@@ -771,7 +1132,7 @@ export default function DeleteWatchComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.watch_delete);
+    console.log(mutation.data.watch);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }

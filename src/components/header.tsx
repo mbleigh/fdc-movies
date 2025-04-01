@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/use-auth";
 import { signIn, signOut } from "@/lib/firebase";
 import { User } from "firebase/auth";
+import { Film, History, Sparkle } from "lucide-react";
 
 // Icons
 function SearchIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -161,14 +162,21 @@ export default function Header({ className }: HeaderProps) {
 
 					{/* Navigation links */}
 					<nav className="hidden md:flex items-center space-x-2">
-						{/* <Button asChild variant="ghost">
-							<Link href="/browse">Browse</Link>
-						</Button> */}
 						<Button asChild variant="ghost">
-							<Link href="/watches">My Watches</Link>
+							<Link href="/browse">
+								<Film /> Browse
+							</Link>
 						</Button>
 						<Button asChild variant="ghost">
-							<Link href="/recommender">Watch Tonight</Link>
+							<Link href="/watches">
+								<History />
+								My Watches
+							</Link>
+						</Button>
+						<Button asChild variant="ghost">
+							<Link href="/recommender">
+								<Sparkle /> NextWatch
+							</Link>
 						</Button>
 					</nav>
 				</div>

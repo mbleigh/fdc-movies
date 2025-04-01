@@ -1,6 +1,6 @@
 mutation UpdateUser($displayName: String, $imageUrl: String, $username: String!)
 @auth(level: USER) {
-	user_upsert(
+	user: user_upsert(
 		data: {
 			uid_expr: "auth.uid"
 			displayName: $displayName
@@ -10,20 +10,30 @@ mutation UpdateUser($displayName: String, $imageUrl: String, $username: String!)
 	)
 }
 
-mutation AddWatch($movieId: String!, $format: String, $watchDate: Date)
+mutation AddWatch($movieId: String!, $format: String, $watchDate: Date, $reviewId: UUID)
 @auth(level: USER) {
-	watch_insert(
+	watch: watch_insert(
 		data: {
 			movieId: $movieId
 			userUid_expr: "auth.uid"
 			format: $format
 			watchDate: $watchDate
+			reviewId: $reviewId
 		}
 	)
 }
 
+mutation AddReview($movieId: String!, $rating: Int!, $review: String) @auth(level: USER) {
+	review: review_insert(data: {
+		userUid_expr: "auth.uid"
+		movieId: $movieId
+		reviewTime_expr: "request.time"
+		rating: $rating
+	})
+}
+
 mutation DeleteWatch($watchId: UUID!) @auth(level: USER) {
-	watch_delete(
+	watch: watch_delete(
 		first: { where: { userUid: { eq_expr: "auth.uid" }, id: { eq: $watchId } } }
 	)
 }

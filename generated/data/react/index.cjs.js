@@ -1,9 +1,9 @@
 const { updateUserRef, addWatchRef, addReviewRef, deleteWatchRef, homePageRef, searchMoviesRef, moviePageRef, watchHistoryPageRef, browseMoviesRef, getMoviesRef, detailedWatchHistoryRef, connectorConfig } = require('../index.cjs.js');
 const { validateArgs, CallerSdkTypeEnum } = require('firebase/data-connect');
-const { useDataConnectQuery, useDataConnectMutation } = require('@tanstack-query-firebase/react/data-connect');
+const { useDataConnectQuery, useDataConnectMutation, validateReactArgs } = require('@tanstack-query-firebase/react/data-connect');
 
 exports.useUpdateUser = function useUpdateUser(dcOrOptions, options) {
-  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options, false);
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return updateUserRef(dcInstance, vars);
   }
@@ -11,7 +11,7 @@ exports.useUpdateUser = function useUpdateUser(dcOrOptions, options) {
 }
 
 exports.useAddWatch = function useAddWatch(dcOrOptions, options) {
-  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options, false);
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return addWatchRef(dcInstance, vars);
   }
@@ -19,7 +19,7 @@ exports.useAddWatch = function useAddWatch(dcOrOptions, options) {
 }
 
 exports.useAddReview = function useAddReview(dcOrOptions, options) {
-  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options, false);
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return addReviewRef(dcInstance, vars);
   }
@@ -27,7 +27,7 @@ exports.useAddReview = function useAddReview(dcOrOptions, options) {
 }
 
 exports.useDeleteWatch = function useDeleteWatch(dcOrOptions, options) {
-  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options, false);
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return deleteWatchRef(dcInstance, vars);
   }
@@ -35,44 +35,44 @@ exports.useDeleteWatch = function useDeleteWatch(dcOrOptions, options) {
 }
 
 
-exports.useHomePage = function useHomePage(dc, options) {
-  const { dc: dcInstance } = validateArgs(connectorConfig, dc, undefined, false);
+exports.useHomePage = function useHomePage(dcOrOptions, options) {
+  const { dc: dcInstance, options: inputOpts } = validateReactArgs(connectorConfig, dcOrOptions, options);
   const ref = homePageRef(dcInstance);
-  return useDataConnectQuery(ref, options, CallerSdkTypeEnum.GeneratedReact);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
-exports.useSearchMovies = function useSearchMovies(dcOrVars, vars, options) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, false);
+exports.useSearchMovies = function useSearchMovies(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   const ref = searchMoviesRef(dcInstance, inputVars);
-  return useDataConnectQuery(ref, options, CallerSdkTypeEnum.GeneratedReact);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
-exports.useMoviePage = function useMoviePage(dcOrVars, vars, options) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, false);
+exports.useMoviePage = function useMoviePage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   const ref = moviePageRef(dcInstance, inputVars);
-  return useDataConnectQuery(ref, options, CallerSdkTypeEnum.GeneratedReact);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
-exports.useWatchHistoryPage = function useWatchHistoryPage(dcOrVars, vars, options) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, false);
+exports.useWatchHistoryPage = function useWatchHistoryPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
   const ref = watchHistoryPageRef(dcInstance, inputVars);
-  return useDataConnectQuery(ref, options, CallerSdkTypeEnum.GeneratedReact);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
-exports.useBrowseMovies = function useBrowseMovies(dcOrVars, vars, options) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, false);
+exports.useBrowseMovies = function useBrowseMovies(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
   const ref = browseMoviesRef(dcInstance, inputVars);
-  return useDataConnectQuery(ref, options, CallerSdkTypeEnum.GeneratedReact);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
-exports.useGetMovies = function useGetMovies(dcOrVars, vars, options) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, false);
+exports.useGetMovies = function useGetMovies(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
   const ref = getMoviesRef(dcInstance, inputVars);
-  return useDataConnectQuery(ref, options, CallerSdkTypeEnum.GeneratedReact);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
-exports.useDetailedWatchHistory = function useDetailedWatchHistory(dc, options) {
-  const { dc: dcInstance } = validateArgs(connectorConfig, dc, undefined, false);
+exports.useDetailedWatchHistory = function useDetailedWatchHistory(dcOrOptions, options) {
+  const { dc: dcInstance, options: inputOpts } = validateReactArgs(connectorConfig, dcOrOptions, options);
   const ref = detailedWatchHistoryRef(dcInstance);
-  return useDataConnectQuery(ref, options, CallerSdkTypeEnum.GeneratedReact);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }

@@ -71,7 +71,7 @@ A connector is a collection of Queries and Mutations. One SDK is generated for e
 You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig } from '@app/data';
 
 const dataConnect = getDataConnect(connectorConfig);
@@ -84,7 +84,7 @@ To connect to the emulator, you can use the following code.
 You can also follow the emulator instructions from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#emulator-react).
 
 ```javascript
-import { connectDataConnectEmulator, getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectDataConnectEmulator, getDataConnect } from 'firebase/data-connect';
 import { connectorConfig } from '@app/data';
 
 const dataConnect = getDataConnect(connectorConfig);
@@ -101,29 +101,32 @@ Calling these hook functions will return a `UseQueryResult` object. This object 
 
 TanStack React Query caches the results of your Queries, so using the same Query hook function in multiple places in your application allows the entire application to automatically see updates to that Query's data.
 
-Query hooks execute their Queries automatically when called, and periodically refresh, unless you change the `queryOptions` for the Query. To learn how to stop a Query from automatically executing, see the [TanStack React Query documentation](https://tanstack.com/query/latest/docs/framework/react/guides/disabling-queries). To learn how to make "lazy loading" Queries, you can also read [this post](https://stackoverflow.com/a/70516680/21417394) by [TkDodo](https://tkdodo.eu/blog/) (Dominik Dorfmeister), a maintainer of TanStack React Query.
+Query hooks execute their Queries automatically when called, and periodically refresh, unless you change the `queryOptions` for the Query. To learn how to stop a Query from automatically executing, including how to make a query "lazy", see the [TanStack React Query documentation](https://tanstack.com/query/latest/docs/framework/react/guides/disabling-queries).
 
 To learn more about TanStack React Query's Queries, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/guides/queries).
 
 ## Using Query Hooks
 Here's a general overview of how to use the generated Query hooks in your code:
 
-- If the Query has no arguments, the Query hook function does not require arguments.
-- If the Query accepts any arguments (including optional arguments), the Query hook function will require at least one argument: an object that contains all the required variables (and the optional variables) for the Query.
-  - If all of the Query's arguments are optional, the Query hook function does not require any arguments.
+- If the Query has no variables, the Query hook function does not require arguments.
+- If the Query has any required variables, the Query hook function will require at least one argument: an object that contains all the required variables for the Query.
+- If the Query has some required and some optional variables, only required variables are necessary in the variables argument object, and optional variables may be provided as well.
+- If all of the Query's variables are optional, the Query hook function does not require any arguments.
 - Query hook functions can be called with or without passing in a `DataConnect` instance as an argument. If no `DataConnect` argument is passed in, then the generated SDK will call `getDataConnect(connectorConfig)` behind the scenes for you.
-- Query hooks also accept an `options` argument of type `useDataConnectQueryOptions`. To learn more about the `options` argument, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/guides/query-options).
+- Query hooks functions can be called with or without passing in an `options` argument of type `useDataConnectQueryOptions`. To learn more about the `options` argument, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/guides/query-options).
+  - ***Special case:***  If the Query has all optional variables and you would like to provide an `options` argument to the Query hook function without providing any variables, you must pass `undefined` where you would normally pass the Query's variables, and then may provide the `options` argument.
 
 Below are examples of how to use the `connector` connector's generated Query hook functions to execute each Query. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#use_queries_and_mutations_in_your_react_client).
 
 ## HomePage
 You can execute the `HomePage` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+
 ```javascript
-useHomePage(options?: useDataConnectQueryOptions<HomePageData>): UseQueryResult<FlattenedQueryResult<HomePageData, undefined>, FirebaseError>;
+useHomePage(dc: DataConnect, options?: useDataConnectQueryOptions<HomePageData>): UseDataConnectQueryResult<HomePageData, undefined>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useHomePage(dc: DataConnect, options?: useDataConnectQueryOptions<HomePageData>): UseQueryResult<FlattenedQueryResult<HomePageData, undefined>, FirebaseError>;
+useHomePage(options?: useDataConnectQueryOptions<HomePageData>): UseDataConnectQueryResult<HomePageData, undefined>;
 ```
 
 ### Variables
@@ -198,11 +201,12 @@ To learn more about the `UseQueryResult` object, see the [TanStack React Query d
 ### Using `HomePage`'s Query hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig } from '@app/data';
 import { useHomePage } from '@app/data/react'
 
 export default function HomePageComponent() {
+
 
   // You don't have to do anything to "execute" the Query.
   // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
@@ -211,6 +215,15 @@ export default function HomePageComponent() {
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const query = useHomePage(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useHomePage(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useHomePage(dataConnect, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -233,12 +246,13 @@ export default function HomePageComponent() {
 
 ## SearchMovies
 You can execute the `SearchMovies` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+
 ```javascript
-useSearchMovies(vars: SearchMoviesVariables, options?: useDataConnectQueryOptions<SearchMoviesData>): UseQueryResult<FlattenedQueryResult<SearchMoviesData, SearchMoviesVariables>, FirebaseError>;
+useSearchMovies(dc: DataConnect, vars: SearchMoviesVariables, options?: useDataConnectQueryOptions<SearchMoviesData>): UseDataConnectQueryResult<SearchMoviesData, SearchMoviesVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useSearchMovies(dc: DataConnect, vars: SearchMoviesVariables, options?: useDataConnectQueryOptions<SearchMoviesData>): UseQueryResult<FlattenedQueryResult<SearchMoviesData, SearchMoviesVariables>, FirebaseError>;
+useSearchMovies(vars: SearchMoviesVariables, options?: useDataConnectQueryOptions<SearchMoviesData>): UseDataConnectQueryResult<SearchMoviesData, SearchMoviesVariables>;
 ```
 
 ### Variables
@@ -279,11 +293,12 @@ To learn more about the `UseQueryResult` object, see the [TanStack React Query d
 ### Using `SearchMovies`'s Query hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, SearchMoviesVariables } from '@app/data';
 import { useSearchMovies } from '@app/data/react'
 
 export default function SearchMoviesComponent() {
+
   // The `useSearchMovies` Query hook requires an argument of type `SearchMoviesVariables`:
   const searchMoviesVars: SearchMoviesVariables = {
     query: ..., 
@@ -298,6 +313,15 @@ export default function SearchMoviesComponent() {
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const query = useSearchMovies(dataConnect, searchMoviesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useSearchMovies(searchMoviesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useSearchMovies(dataConnect, searchMoviesVars, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -318,12 +342,13 @@ export default function SearchMoviesComponent() {
 
 ## MoviePage
 You can execute the `MoviePage` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+
 ```javascript
-useMoviePage(vars: MoviePageVariables, options?: useDataConnectQueryOptions<MoviePageData>): UseQueryResult<FlattenedQueryResult<MoviePageData, MoviePageVariables>, FirebaseError>;
+useMoviePage(dc: DataConnect, vars: MoviePageVariables, options?: useDataConnectQueryOptions<MoviePageData>): UseDataConnectQueryResult<MoviePageData, MoviePageVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useMoviePage(dc: DataConnect, vars: MoviePageVariables, options?: useDataConnectQueryOptions<MoviePageData>): UseQueryResult<FlattenedQueryResult<MoviePageData, MoviePageVariables>, FirebaseError>;
+useMoviePage(vars: MoviePageVariables, options?: useDataConnectQueryOptions<MoviePageData>): UseDataConnectQueryResult<MoviePageData, MoviePageVariables>;
 ```
 
 ### Variables
@@ -386,11 +411,12 @@ To learn more about the `UseQueryResult` object, see the [TanStack React Query d
 ### Using `MoviePage`'s Query hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, MoviePageVariables } from '@app/data';
 import { useMoviePage } from '@app/data/react'
 
 export default function MoviePageComponent() {
+
   // The `useMoviePage` Query hook requires an argument of type `MoviePageVariables`:
   const moviePageVars: MoviePageVariables = {
     movieId: ..., 
@@ -405,6 +431,15 @@ export default function MoviePageComponent() {
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const query = useMoviePage(dataConnect, moviePageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useMoviePage(moviePageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useMoviePage(dataConnect, moviePageVars, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -425,16 +460,17 @@ export default function MoviePageComponent() {
 
 ## WatchHistoryPage
 You can execute the `WatchHistoryPage` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+
 ```javascript
-useWatchHistoryPage(vars?: WatchHistoryPageVariables, options?: useDataConnectQueryOptions<WatchHistoryPageData>): UseQueryResult<FlattenedQueryResult<WatchHistoryPageData, WatchHistoryPageVariables>, FirebaseError>;
+useWatchHistoryPage(dc: DataConnect, vars?: WatchHistoryPageVariables, options?: useDataConnectQueryOptions<WatchHistoryPageData>): UseDataConnectQueryResult<WatchHistoryPageData, WatchHistoryPageVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useWatchHistoryPage(dc: DataConnect, vars?: WatchHistoryPageVariables, options?: useDataConnectQueryOptions<WatchHistoryPageData>): UseQueryResult<FlattenedQueryResult<WatchHistoryPageData, WatchHistoryPageVariables>, FirebaseError>;
+useWatchHistoryPage(vars?: WatchHistoryPageVariables, options?: useDataConnectQueryOptions<WatchHistoryPageData>): UseDataConnectQueryResult<WatchHistoryPageData, WatchHistoryPageVariables>;
 ```
 
 ### Variables
-The `WatchHistoryPage` Query requires an argument of type `WatchHistoryPageVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+The `WatchHistoryPage` Query has an optional argument of type `WatchHistoryPageVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
 export interface WatchHistoryPageVariables {
@@ -488,12 +524,13 @@ To learn more about the `UseQueryResult` object, see the [TanStack React Query d
 ### Using `WatchHistoryPage`'s Query hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, WatchHistoryPageVariables } from '@app/data';
 import { useWatchHistoryPage } from '@app/data/react'
 
 export default function WatchHistoryPageComponent() {
-  // The `useWatchHistoryPage` Query hook requires an argument of type `WatchHistoryPageVariables`:
+
+  // The `useWatchHistoryPage` Query hook has an optional argument of type `WatchHistoryPageVariables`:
   const watchHistoryPageVars: WatchHistoryPageVariables = {
     limit: ..., // optional
   };
@@ -504,11 +541,24 @@ export default function WatchHistoryPageComponent() {
   // Variables can be defined inline as well.
   const query = useWatchHistoryPage({ limit: ..., });
   // Since all variables are optional for this Query, you can omit the `WatchHistoryPageVariables` argument.
+  // (as long as you don't want to provide any `options`!)
   const query = useWatchHistoryPage();
 
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const query = useWatchHistoryPage(dataConnect, watchHistoryPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useWatchHistoryPage(watchHistoryPageVars, options);
+  // If you'd like to provide options without providing any variables, you must 
+  // pass `undefined` where you would normally pass the variables.
+  const query = useWatchHistoryPage(undefined, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useWatchHistoryPage(dataConnect, watchHistoryPageVars /** or undefined */, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -529,16 +579,17 @@ export default function WatchHistoryPageComponent() {
 
 ## BrowseMovies
 You can execute the `BrowseMovies` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+
 ```javascript
-useBrowseMovies(vars?: BrowseMoviesVariables, options?: useDataConnectQueryOptions<BrowseMoviesData>): UseQueryResult<FlattenedQueryResult<BrowseMoviesData, BrowseMoviesVariables>, FirebaseError>;
+useBrowseMovies(dc: DataConnect, vars?: BrowseMoviesVariables, options?: useDataConnectQueryOptions<BrowseMoviesData>): UseDataConnectQueryResult<BrowseMoviesData, BrowseMoviesVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useBrowseMovies(dc: DataConnect, vars?: BrowseMoviesVariables, options?: useDataConnectQueryOptions<BrowseMoviesData>): UseQueryResult<FlattenedQueryResult<BrowseMoviesData, BrowseMoviesVariables>, FirebaseError>;
+useBrowseMovies(vars?: BrowseMoviesVariables, options?: useDataConnectQueryOptions<BrowseMoviesData>): UseDataConnectQueryResult<BrowseMoviesData, BrowseMoviesVariables>;
 ```
 
 ### Variables
-The `BrowseMovies` Query requires an argument of type `BrowseMoviesVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+The `BrowseMovies` Query has an optional argument of type `BrowseMoviesVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
 export interface BrowseMoviesVariables {
@@ -579,12 +630,13 @@ To learn more about the `UseQueryResult` object, see the [TanStack React Query d
 ### Using `BrowseMovies`'s Query hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, BrowseMoviesVariables } from '@app/data';
 import { useBrowseMovies } from '@app/data/react'
 
 export default function BrowseMoviesComponent() {
-  // The `useBrowseMovies` Query hook requires an argument of type `BrowseMoviesVariables`:
+
+  // The `useBrowseMovies` Query hook has an optional argument of type `BrowseMoviesVariables`:
   const browseMoviesVars: BrowseMoviesVariables = {
     partialTitle: ..., // optional
     minDate: ..., // optional
@@ -600,11 +652,24 @@ export default function BrowseMoviesComponent() {
   // Variables can be defined inline as well.
   const query = useBrowseMovies({ partialTitle: ..., minDate: ..., maxDate: ..., minRating: ..., ratings: ..., genres: ..., });
   // Since all variables are optional for this Query, you can omit the `BrowseMoviesVariables` argument.
+  // (as long as you don't want to provide any `options`!)
   const query = useBrowseMovies();
 
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const query = useBrowseMovies(dataConnect, browseMoviesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useBrowseMovies(browseMoviesVars, options);
+  // If you'd like to provide options without providing any variables, you must 
+  // pass `undefined` where you would normally pass the variables.
+  const query = useBrowseMovies(undefined, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useBrowseMovies(dataConnect, browseMoviesVars /** or undefined */, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -625,16 +690,17 @@ export default function BrowseMoviesComponent() {
 
 ## GetMovies
 You can execute the `GetMovies` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+
 ```javascript
-useGetMovies(vars?: GetMoviesVariables, options?: useDataConnectQueryOptions<GetMoviesData>): UseQueryResult<FlattenedQueryResult<GetMoviesData, GetMoviesVariables>, FirebaseError>;
+useGetMovies(dc: DataConnect, vars?: GetMoviesVariables, options?: useDataConnectQueryOptions<GetMoviesData>): UseDataConnectQueryResult<GetMoviesData, GetMoviesVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useGetMovies(dc: DataConnect, vars?: GetMoviesVariables, options?: useDataConnectQueryOptions<GetMoviesData>): UseQueryResult<FlattenedQueryResult<GetMoviesData, GetMoviesVariables>, FirebaseError>;
+useGetMovies(vars?: GetMoviesVariables, options?: useDataConnectQueryOptions<GetMoviesData>): UseDataConnectQueryResult<GetMoviesData, GetMoviesVariables>;
 ```
 
 ### Variables
-The `GetMovies` Query requires an argument of type `GetMoviesVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
+The `GetMovies` Query has an optional argument of type `GetMoviesVariables`, which is defined in [data/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
 export interface GetMoviesVariables {
@@ -670,12 +736,13 @@ To learn more about the `UseQueryResult` object, see the [TanStack React Query d
 ### Using `GetMovies`'s Query hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, GetMoviesVariables } from '@app/data';
 import { useGetMovies } from '@app/data/react'
 
 export default function GetMoviesComponent() {
-  // The `useGetMovies` Query hook requires an argument of type `GetMoviesVariables`:
+
+  // The `useGetMovies` Query hook has an optional argument of type `GetMoviesVariables`:
   const getMoviesVars: GetMoviesVariables = {
     ids: ..., // optional
   };
@@ -686,11 +753,24 @@ export default function GetMoviesComponent() {
   // Variables can be defined inline as well.
   const query = useGetMovies({ ids: ..., });
   // Since all variables are optional for this Query, you can omit the `GetMoviesVariables` argument.
+  // (as long as you don't want to provide any `options`!)
   const query = useGetMovies();
 
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const query = useGetMovies(dataConnect, getMoviesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMovies(getMoviesVars, options);
+  // If you'd like to provide options without providing any variables, you must 
+  // pass `undefined` where you would normally pass the variables.
+  const query = useGetMovies(undefined, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMovies(dataConnect, getMoviesVars /** or undefined */, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -711,12 +791,13 @@ export default function GetMoviesComponent() {
 
 ## DetailedWatchHistory
 You can execute the `DetailedWatchHistory` Query using the following Query hook function, which is defined in [data/react/index.d.ts](./index.d.ts):
+
 ```javascript
-useDetailedWatchHistory(options?: useDataConnectQueryOptions<DetailedWatchHistoryData>): UseQueryResult<FlattenedQueryResult<DetailedWatchHistoryData, undefined>, FirebaseError>;
+useDetailedWatchHistory(dc: DataConnect, options?: useDataConnectQueryOptions<DetailedWatchHistoryData>): UseDataConnectQueryResult<DetailedWatchHistoryData, undefined>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useDetailedWatchHistory(dc: DataConnect, options?: useDataConnectQueryOptions<DetailedWatchHistoryData>): UseQueryResult<FlattenedQueryResult<DetailedWatchHistoryData, undefined>, FirebaseError>;
+useDetailedWatchHistory(options?: useDataConnectQueryOptions<DetailedWatchHistoryData>): UseDataConnectQueryResult<DetailedWatchHistoryData, undefined>;
 ```
 
 ### Variables
@@ -773,11 +854,12 @@ To learn more about the `UseQueryResult` object, see the [TanStack React Query d
 ### Using `DetailedWatchHistory`'s Query hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig } from '@app/data';
 import { useDetailedWatchHistory } from '@app/data/react'
 
 export default function DetailedWatchHistoryComponent() {
+
 
   // You don't have to do anything to "execute" the Query.
   // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
@@ -786,6 +868,15 @@ export default function DetailedWatchHistoryComponent() {
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const query = useDetailedWatchHistory(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useDetailedWatchHistory(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useDetailedWatchHistory(dataConnect, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -817,25 +908,26 @@ To learn more about TanStack React Query's Mutations, see the [TanStack React Qu
 ## Using Mutation Hooks
 Here's a general overview of how to use the generated Mutation hooks in your code:
 
-- Mutation hook functions are not called with the arguments to the mutation. Instead, arguments are passed to `UseMutationResult.mutate()`.
-- If the Mutation has no arguments, the `mutate()` function does not require arguments.
-- If the Mutation accepts any arguments (including optional arguments), the `mutate()` function will require at least one argument: an object that contains all the required variables (and the optional variables) for the Mutation.
-  - If all of the Mutation's arguments are optional, the `mutate()` function does not require any arguments.
+- Mutation hook functions are not called with the arguments to the Mutation. Instead, arguments are passed to `UseMutationResult.mutate()`.
+- If the Mutation has no variables, the `mutate()` function does not require arguments.
+- If the Mutation has any required variables, the `mutate()` function will require at least one argument: an object that contains all the required variables for the Mutation.
+- If the Mutation has some required and some optional variables, only required variables are necessary in the variables argument object, and optional variables may be provided as well.
+- If all of the Mutation's variables are optional, the Mutation hook function does not require any arguments.
 - Mutation hook functions can be called with or without passing in a `DataConnect` instance as an argument. If no `DataConnect` argument is passed in, then the generated SDK will call `getDataConnect(connectorConfig)` behind the scenes for you.
 - Mutation hooks also accept an `options` argument of type `useDataConnectMutationOptions`. To learn more about the `options` argument, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/guides/mutations#mutation-side-effects).
   - `UseMutationResult.mutate()` also accepts an `options` argument of type `useDataConnectMutationOptions`.
-  - ***Special case:*** If the Mutation has no arguments, and you want to pass options to `UseMutationResult.mutate()`, you must pass `undefined` as the first argument (where you would normally pass the Mutation's arguments) to `UseMutationResult.mutate()`, and then the options as the second argument.
+  - ***Special case:*** If the Mutation has no arguments (or all optional arguments and you wish to provide none), and you want to pass `options` to `UseMutationResult.mutate()`, you must pass `undefined` where you would normally pass the Mutation's arguments, and then may provide the options argument.
 
-Below are examples of how to use the `connector` connector's generated Query hook functions to execute each Query. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#use_queries_and_mutations_in_your_react_client).
+Below are examples of how to use the `connector` connector's generated Mutation hook functions to execute each Mutation. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#use_queries_and_mutations_in_your_react_client).
 
 ## UpdateUser
 You can execute the `UpdateUser` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [data/react/index.d.ts](./index.d.ts)):
 ```javascript
-useUpdateUser(options?: useDataConnectMutationOptions<UpdateUserData, FirebaseError, UpdateUserVariables>): UseMutationResult<FlattenedMutationResult<UpdateUserData, UpdateUserVariables>, FirebaseError, UpdateUserVariables>;
+useUpdateUser(options?: useDataConnectMutationOptions<UpdateUserData, FirebaseError, UpdateUserVariables>): UseDataConnectMutationResult<UpdateUserData, UpdateUserVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useUpdateUser(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateUserData, FirebaseError, UpdateUserVariables>): UseMutationResult<FlattenedMutationResult<UpdateUserData, UpdateUserVariables>, FirebaseError, UpdateUserVariables>;
+useUpdateUser(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateUserData, FirebaseError, UpdateUserVariables>): UseDataConnectMutationResult<UpdateUserData, UpdateUserVariables>;
 ```
 
 ### Variables
@@ -867,16 +959,30 @@ To learn more about the `UseMutationResult` object, see the [TanStack React Quer
 ### Using `UpdateUser`'s Mutation hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, UpdateUserVariables } from '@app/data';
 import { useUpdateUser } from '@app/data/react'
 
 export default function UpdateUserComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
   const mutation = useUpdateUser();
+
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const mutation = useUpdateUser(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateUser(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateUser(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateUser` Mutation requires an argument of type `UpdateUserVariables`:
@@ -888,6 +994,12 @@ export default function UpdateUserComponent() {
   mutation.mutate(updateUserVars);
   // Variables can be defined inline as well.
   mutation.mutate({ displayName: ..., imageUrl: ..., username: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(updateUserVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -909,11 +1021,11 @@ export default function UpdateUserComponent() {
 ## AddWatch
 You can execute the `AddWatch` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [data/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAddWatch(options?: useDataConnectMutationOptions<AddWatchData, FirebaseError, AddWatchVariables>): UseMutationResult<FlattenedMutationResult<AddWatchData, AddWatchVariables>, FirebaseError, AddWatchVariables>;
+useAddWatch(options?: useDataConnectMutationOptions<AddWatchData, FirebaseError, AddWatchVariables>): UseDataConnectMutationResult<AddWatchData, AddWatchVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAddWatch(dc: DataConnect, options?: useDataConnectMutationOptions<AddWatchData, FirebaseError, AddWatchVariables>): UseMutationResult<FlattenedMutationResult<AddWatchData, AddWatchVariables>, FirebaseError, AddWatchVariables>;
+useAddWatch(dc: DataConnect, options?: useDataConnectMutationOptions<AddWatchData, FirebaseError, AddWatchVariables>): UseDataConnectMutationResult<AddWatchData, AddWatchVariables>;
 ```
 
 ### Variables
@@ -946,16 +1058,30 @@ To learn more about the `UseMutationResult` object, see the [TanStack React Quer
 ### Using `AddWatch`'s Mutation hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, AddWatchVariables } from '@app/data';
 import { useAddWatch } from '@app/data/react'
 
 export default function AddWatchComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
   const mutation = useAddWatch();
+
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const mutation = useAddWatch(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAddWatch(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAddWatch(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useAddWatch` Mutation requires an argument of type `AddWatchVariables`:
@@ -968,6 +1094,12 @@ export default function AddWatchComponent() {
   mutation.mutate(addWatchVars);
   // Variables can be defined inline as well.
   mutation.mutate({ movieId: ..., format: ..., watchDate: ..., reviewId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(addWatchVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -989,11 +1121,11 @@ export default function AddWatchComponent() {
 ## AddReview
 You can execute the `AddReview` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [data/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAddReview(options?: useDataConnectMutationOptions<AddReviewData, FirebaseError, AddReviewVariables>): UseMutationResult<FlattenedMutationResult<AddReviewData, AddReviewVariables>, FirebaseError, AddReviewVariables>;
+useAddReview(options?: useDataConnectMutationOptions<AddReviewData, FirebaseError, AddReviewVariables>): UseDataConnectMutationResult<AddReviewData, AddReviewVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAddReview(dc: DataConnect, options?: useDataConnectMutationOptions<AddReviewData, FirebaseError, AddReviewVariables>): UseMutationResult<FlattenedMutationResult<AddReviewData, AddReviewVariables>, FirebaseError, AddReviewVariables>;
+useAddReview(dc: DataConnect, options?: useDataConnectMutationOptions<AddReviewData, FirebaseError, AddReviewVariables>): UseDataConnectMutationResult<AddReviewData, AddReviewVariables>;
 ```
 
 ### Variables
@@ -1025,16 +1157,30 @@ To learn more about the `UseMutationResult` object, see the [TanStack React Quer
 ### Using `AddReview`'s Mutation hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, AddReviewVariables } from '@app/data';
 import { useAddReview } from '@app/data/react'
 
 export default function AddReviewComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
   const mutation = useAddReview();
+
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const mutation = useAddReview(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAddReview(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAddReview(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useAddReview` Mutation requires an argument of type `AddReviewVariables`:
@@ -1046,6 +1192,12 @@ export default function AddReviewComponent() {
   mutation.mutate(addReviewVars);
   // Variables can be defined inline as well.
   mutation.mutate({ movieId: ..., rating: ..., review: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(addReviewVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -1067,11 +1219,11 @@ export default function AddReviewComponent() {
 ## DeleteWatch
 You can execute the `DeleteWatch` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [data/react/index.d.ts](./index.d.ts)):
 ```javascript
-useDeleteWatch(options?: useDataConnectMutationOptions<DeleteWatchData, FirebaseError, DeleteWatchVariables>): UseMutationResult<FlattenedMutationResult<DeleteWatchData, DeleteWatchVariables>, FirebaseError, DeleteWatchVariables>;
+useDeleteWatch(options?: useDataConnectMutationOptions<DeleteWatchData, FirebaseError, DeleteWatchVariables>): UseDataConnectMutationResult<DeleteWatchData, DeleteWatchVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useDeleteWatch(dc: DataConnect, options?: useDataConnectMutationOptions<DeleteWatchData, FirebaseError, DeleteWatchVariables>): UseMutationResult<FlattenedMutationResult<DeleteWatchData, DeleteWatchVariables>, FirebaseError, DeleteWatchVariables>;
+useDeleteWatch(dc: DataConnect, options?: useDataConnectMutationOptions<DeleteWatchData, FirebaseError, DeleteWatchVariables>): UseDataConnectMutationResult<DeleteWatchData, DeleteWatchVariables>;
 ```
 
 ### Variables
@@ -1101,16 +1253,30 @@ To learn more about the `UseMutationResult` object, see the [TanStack React Quer
 ### Using `DeleteWatch`'s Mutation hook function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, DeleteWatchVariables } from '@app/data';
 import { useDeleteWatch } from '@app/data/react'
 
 export default function DeleteWatchComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
   const mutation = useDeleteWatch();
+
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
   const mutation = useDeleteWatch(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteWatch(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteWatch(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDeleteWatch` Mutation requires an argument of type `DeleteWatchVariables`:
@@ -1120,6 +1286,12 @@ export default function DeleteWatchComponent() {
   mutation.mutate(deleteWatchVars);
   // Variables can be defined inline as well.
   mutation.mutate({ watchId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(deleteWatchVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {

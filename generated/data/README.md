@@ -31,7 +31,7 @@ A connector is a collection of Queries and Mutations. One SDK is generated for e
 You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig } from '@app/data';
 
 const dataConnect = getDataConnect(connectorConfig);
@@ -44,7 +44,7 @@ To connect to the emulator, you can use the following code.
 You can also follow the emulator instructions from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#instrument-clients).
 
 ```javascript
-import { connectDataConnectEmulator, getDataConnect, DataConnect } from 'firebase/data-connect';
+import { connectDataConnectEmulator, getDataConnect } from 'firebase/data-connect';
 import { connectorConfig } from '@app/data';
 
 const dataConnect = getDataConnect(connectorConfig);
@@ -149,7 +149,7 @@ export interface HomePageData {
 ### Using `HomePage`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, homePage } from '@app/data';
 
 
@@ -177,7 +177,7 @@ homePage().then((response) => {
 ### Using `HomePage`'s `QueryRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
 import { connectorConfig, homePageRef } from '@app/data';
 
 
@@ -252,7 +252,7 @@ export interface SearchMoviesData {
 ### Using `SearchMovies`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, searchMovies, SearchMoviesVariables } from '@app/data';
 
 // The `SearchMovies` query requires an argument of type `SearchMoviesVariables`:
@@ -282,7 +282,7 @@ searchMovies(searchMoviesVars).then((response) => {
 ### Using `SearchMovies`'s `QueryRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
 import { connectorConfig, searchMoviesRef, SearchMoviesVariables } from '@app/data';
 
 // The `SearchMovies` query requires an argument of type `SearchMoviesVariables`:
@@ -381,7 +381,7 @@ export interface MoviePageData {
 ### Using `MoviePage`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, moviePage, MoviePageVariables } from '@app/data';
 
 // The `MoviePage` query requires an argument of type `MoviePageVariables`:
@@ -411,7 +411,7 @@ moviePage(moviePageVars).then((response) => {
 ### Using `MoviePage`'s `QueryRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
 import { connectorConfig, moviePageRef, MoviePageVariables } from '@app/data';
 
 // The `MoviePage` query requires an argument of type `MoviePageVariables`:
@@ -505,7 +505,7 @@ export interface WatchHistoryPageData {
 ### Using `WatchHistoryPage`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, watchHistoryPage, WatchHistoryPageVariables } from '@app/data';
 
 // The `WatchHistoryPage` query has an optional argument of type `WatchHistoryPageVariables`:
@@ -537,7 +537,7 @@ watchHistoryPage(watchHistoryPageVars).then((response) => {
 ### Using `WatchHistoryPage`'s `QueryRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
 import { connectorConfig, watchHistoryPageRef, WatchHistoryPageVariables } from '@app/data';
 
 // The `WatchHistoryPage` query has an optional argument of type `WatchHistoryPageVariables`:
@@ -620,7 +620,7 @@ export interface BrowseMoviesData {
 ### Using `BrowseMovies`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, browseMovies, BrowseMoviesVariables } from '@app/data';
 
 // The `BrowseMovies` query has an optional argument of type `BrowseMoviesVariables`:
@@ -657,7 +657,7 @@ browseMovies(browseMoviesVars).then((response) => {
 ### Using `BrowseMovies`'s `QueryRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
 import { connectorConfig, browseMoviesRef, BrowseMoviesVariables } from '@app/data';
 
 // The `BrowseMovies` query has an optional argument of type `BrowseMoviesVariables`:
@@ -740,7 +740,7 @@ export interface GetMoviesData {
 ### Using `GetMovies`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, getMovies, GetMoviesVariables } from '@app/data';
 
 // The `GetMovies` query has an optional argument of type `GetMoviesVariables`:
@@ -772,7 +772,7 @@ getMovies(getMoviesVars).then((response) => {
 ### Using `GetMovies`'s `QueryRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
 import { connectorConfig, getMoviesRef, GetMoviesVariables } from '@app/data';
 
 // The `GetMovies` query has an optional argument of type `GetMoviesVariables`:
@@ -867,7 +867,7 @@ export interface DetailedWatchHistoryData {
 ### Using `DetailedWatchHistory`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, detailedWatchHistory } from '@app/data';
 
 
@@ -891,7 +891,7 @@ detailedWatchHistory().then((response) => {
 ### Using `DetailedWatchHistory`'s `QueryRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeQuery } from 'firebase/data-connect';
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
 import { connectorConfig, detailedWatchHistoryRef } from '@app/data';
 
 
@@ -966,7 +966,7 @@ export interface UpdateUserData {
 ### Using `UpdateUser`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, updateUser, UpdateUserVariables } from '@app/data';
 
 // The `UpdateUser` mutation requires an argument of type `UpdateUserVariables`:
@@ -998,7 +998,7 @@ updateUser(updateUserVars).then((response) => {
 ### Using `UpdateUser`'s `MutationRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeMutation } from 'firebase/data-connect';
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
 import { connectorConfig, updateUserRef, UpdateUserVariables } from '@app/data';
 
 // The `UpdateUser` mutation requires an argument of type `UpdateUserVariables`:
@@ -1067,7 +1067,7 @@ export interface AddWatchData {
 ### Using `AddWatch`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, addWatch, AddWatchVariables } from '@app/data';
 
 // The `AddWatch` mutation requires an argument of type `AddWatchVariables`:
@@ -1100,7 +1100,7 @@ addWatch(addWatchVars).then((response) => {
 ### Using `AddWatch`'s `MutationRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeMutation } from 'firebase/data-connect';
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
 import { connectorConfig, addWatchRef, AddWatchVariables } from '@app/data';
 
 // The `AddWatch` mutation requires an argument of type `AddWatchVariables`:
@@ -1169,7 +1169,7 @@ export interface AddReviewData {
 ### Using `AddReview`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, addReview, AddReviewVariables } from '@app/data';
 
 // The `AddReview` mutation requires an argument of type `AddReviewVariables`:
@@ -1201,7 +1201,7 @@ addReview(addReviewVars).then((response) => {
 ### Using `AddReview`'s `MutationRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeMutation } from 'firebase/data-connect';
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
 import { connectorConfig, addReviewRef, AddReviewVariables } from '@app/data';
 
 // The `AddReview` mutation requires an argument of type `AddReviewVariables`:
@@ -1267,7 +1267,7 @@ export interface DeleteWatchData {
 ### Using `DeleteWatch`'s action shortcut function
 
 ```javascript
-import { getDataConnect, DataConnect } from 'firebase/data-connect';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig, deleteWatch, DeleteWatchVariables } from '@app/data';
 
 // The `DeleteWatch` mutation requires an argument of type `DeleteWatchVariables`:
@@ -1297,7 +1297,7 @@ deleteWatch(deleteWatchVars).then((response) => {
 ### Using `DeleteWatch`'s `MutationRef` function
 
 ```javascript
-import { getDataConnect, DataConnect, executeMutation } from 'firebase/data-connect';
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
 import { connectorConfig, deleteWatchRef, DeleteWatchVariables } from '@app/data';
 
 // The `DeleteWatch` mutation requires an argument of type `DeleteWatchVariables`:

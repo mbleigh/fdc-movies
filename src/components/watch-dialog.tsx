@@ -76,6 +76,7 @@ export default function WatchDialog({
 
 		// Only create a review if the user has set a rating
 		if (rating > 0) {
+			debugger;
 			// Create the review first
 			const reviewData = await addReview(dc, {
 				movieId: movie.id,
@@ -219,7 +220,7 @@ export default function WatchDialog({
 								placeholder="Write your review here..."
 								className="min-h-[100px] resize-none"
 								value={reviewText}
-								onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+								onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
 									setReviewText(e.target.value)
 								}
 							/>

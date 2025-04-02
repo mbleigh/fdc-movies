@@ -29,6 +29,7 @@ mutation AddReview($movieId: String!, $rating: Int!, $review: String) @auth(leve
 		movieId: $movieId
 		reviewTime_expr: "request.time"
 		rating: $rating
+		review: $review
 	})
 }
 

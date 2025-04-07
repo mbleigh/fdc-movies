@@ -14,6 +14,7 @@ import type { MessageData } from "genkit";
 import { runFlow } from "genkit/beta/client";
 import { auth } from "@/lib/firebase";
 import { Fireworks } from "@fireworks-js/react";
+import { flushSync } from "react-dom";
 
 // Import types from clarifying-question
 interface QuestionBase {
@@ -152,7 +153,8 @@ export function MovieRecommender({
 	} | null>(null);
 
 	// Helper function to determine the current stage based on messages and selected movie
-	function determineStage(messages: MessageData[]): Stage {
+	function determineStage(): Stage {
+		console.log("determineStage:", messages.at(-1));
 		// If a movie is selected, show the selected stage
 		if (selectedMovie) return "selected";
 
@@ -282,7 +284,8 @@ export function MovieRecommender({
 			...messages,
 			{ role: "user", content: [{ text: userMessage }] },
 		];
-		setMessages(newMessages);
+
+		flushSync(() => setMessages(newMessages));
 		setPrompt("");
 
 		// Call the consolidated function

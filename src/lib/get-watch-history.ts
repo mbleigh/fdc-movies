@@ -1,6 +1,6 @@
-import { dcAdmin, gql } from "./firebase-admin";
+import { dcAdmin } from "./firebase-admin";
 
-const watchHistoryQuery = gql`
+const watchHistoryQuery = `
   fragment MovieOverview on Movie {
     id
     rating
@@ -49,6 +49,7 @@ const watchHistoryQuery = gql`
   }
 `;
 
-export function getWatchHistory(uid: string) {
+export function getWatchHistory(uid: string | undefined) {
+  if (!uid) return null;
   return dcAdmin.executeGraphqlRead(watchHistoryQuery, { variables: { uid } });
 }

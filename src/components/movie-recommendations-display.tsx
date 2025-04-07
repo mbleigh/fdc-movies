@@ -16,6 +16,7 @@ import { MovieRecommendation } from "@/components/movie-recommendation";
 import { useGetMovies } from "@app/data/react";
 import type { GetMoviesData } from "@app/data";
 import type { Movie } from "@/components/movie-poster";
+import { dc } from "@/lib/firebase";
 
 // Interface for the recommended movie from the AI
 interface RecommendedMovie {
@@ -40,7 +41,7 @@ export function MovieRecommendationsDisplay({
 	const movieIds = recommendedMovies.map((movie) => movie.id);
 
 	// Fetch the movies using the useGetMovies hook
-	const { data, isPending, isError } = useGetMovies({ ids: movieIds });
+	const { data, isPending, isError } = useGetMovies(dc, { ids: movieIds });
 
 	// State for refinement input
 	const [refinementText, setRefinementText] = useState("");

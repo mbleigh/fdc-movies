@@ -20,7 +20,10 @@ export const recommenderFlow = ai.defineFlow(
   },
   async (input, { context }) => {
     const { messages } = await recommenderPrompt(
-      { watchHistory: await getWatchHistory(context?.auth?.uid) },
+      {
+        watchHistory: await getWatchHistory(context?.auth?.uid),
+        now: new Date().toISOString(),
+      },
       { messages: input.messages }
     );
 

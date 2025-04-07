@@ -7,111 +7,122 @@ const connectorConfig = {
 };
 exports.connectorConfig = connectorConfig;
 
-exports.updateUserRef = function updateUserRef(dcOrVars, vars) {
+function updateUserRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
   return mutationRef(dcInstance, 'UpdateUser', inputVars);
 }
+exports.updateUserRef = updateUserRef;
 
 exports.updateUser = function updateUser(dcOrVars, vars) {
   return executeMutation(updateUserRef(dcOrVars, vars));
 };
 
-exports.addWatchRef = function addWatchRef(dcOrVars, vars) {
+function addWatchRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
   return mutationRef(dcInstance, 'AddWatch', inputVars);
 }
+exports.addWatchRef = addWatchRef;
 
 exports.addWatch = function addWatch(dcOrVars, vars) {
   return executeMutation(addWatchRef(dcOrVars, vars));
 };
 
-exports.addReviewRef = function addReviewRef(dcOrVars, vars) {
+function addReviewRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
   return mutationRef(dcInstance, 'AddReview', inputVars);
 }
+exports.addReviewRef = addReviewRef;
 
 exports.addReview = function addReview(dcOrVars, vars) {
   return executeMutation(addReviewRef(dcOrVars, vars));
 };
 
-exports.deleteWatchRef = function deleteWatchRef(dcOrVars, vars) {
+function deleteWatchRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
   return mutationRef(dcInstance, 'DeleteWatch', inputVars);
 }
+exports.deleteWatchRef = deleteWatchRef;
 
 exports.deleteWatch = function deleteWatch(dcOrVars, vars) {
   return executeMutation(deleteWatchRef(dcOrVars, vars));
 };
 
-exports.homePageRef = function homePageRef(dc) {
+function homePageRef(dc) {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
   return queryRef(dcInstance, 'HomePage');
 }
+exports.homePageRef = homePageRef;
 
 exports.homePage = function homePage(dc) {
   return executeQuery(homePageRef(dc));
 };
 
-exports.searchMoviesRef = function searchMoviesRef(dcOrVars, vars) {
+function searchMoviesRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
   return queryRef(dcInstance, 'SearchMovies', inputVars);
 }
+exports.searchMoviesRef = searchMoviesRef;
 
 exports.searchMovies = function searchMovies(dcOrVars, vars) {
   return executeQuery(searchMoviesRef(dcOrVars, vars));
 };
 
-exports.moviePageRef = function moviePageRef(dcOrVars, vars) {
+function moviePageRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
   return queryRef(dcInstance, 'MoviePage', inputVars);
 }
+exports.moviePageRef = moviePageRef;
 
 exports.moviePage = function moviePage(dcOrVars, vars) {
   return executeQuery(moviePageRef(dcOrVars, vars));
 };
 
-exports.watchHistoryPageRef = function watchHistoryPageRef(dcOrVars, vars) {
+function watchHistoryPageRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
   dcInstance._useGeneratedSdk();
   return queryRef(dcInstance, 'WatchHistoryPage', inputVars);
 }
+exports.watchHistoryPageRef = watchHistoryPageRef;
 
 exports.watchHistoryPage = function watchHistoryPage(dcOrVars, vars) {
   return executeQuery(watchHistoryPageRef(dcOrVars, vars));
 };
 
-exports.browseMoviesRef = function browseMoviesRef(dcOrVars, vars) {
+function browseMoviesRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
   dcInstance._useGeneratedSdk();
   return queryRef(dcInstance, 'BrowseMovies', inputVars);
 }
+exports.browseMoviesRef = browseMoviesRef;
 
 exports.browseMovies = function browseMovies(dcOrVars, vars) {
   return executeQuery(browseMoviesRef(dcOrVars, vars));
 };
 
-exports.getMoviesRef = function getMoviesRef(dcOrVars, vars) {
+function getMoviesRef(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
   dcInstance._useGeneratedSdk();
   return queryRef(dcInstance, 'GetMovies', inputVars);
 }
+exports.getMoviesRef = getMoviesRef;
 
 exports.getMovies = function getMovies(dcOrVars, vars) {
   return executeQuery(getMoviesRef(dcOrVars, vars));
 };
 
-exports.detailedWatchHistoryRef = function detailedWatchHistoryRef(dc) {
+function detailedWatchHistoryRef(dc) {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
   return queryRef(dcInstance, 'DetailedWatchHistory');
 }
+exports.detailedWatchHistoryRef = detailedWatchHistoryRef;
 
 exports.detailedWatchHistory = function detailedWatchHistory(dc) {
   return executeQuery(detailedWatchHistoryRef(dc));

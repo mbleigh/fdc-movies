@@ -1,6 +1,7 @@
 {
   "emulators": {
     "dataconnect": {
+      "port": 9399,
       "dataDir": "dataconnect/.dataconnect/pgliteData"
     }
   },

@@ -1,11 +1,5 @@
 import { MessageSchema } from "genkit";
 import { ai, z } from "./genkit";
-import { detailedWatchHistory } from "@app/data";
-import { getDataConnect } from "firebase/data-connect";
-import { dc } from "@/lib/firebase";
-import { FirebaseServerApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { dcAdmin, gql } from "@/lib/firebase-admin";
 import { getWatchHistory } from "@/lib/get-watch-history";
 
 const recommenderPrompt = ai.prompt("recommender");

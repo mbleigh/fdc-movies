@@ -6,11 +6,7 @@ import { app } from "@/lib/firebase";
 export const ai = genkit({
   plugins: [
     vertexAI({ projectId: "next25-movies", location: "us-central1" }),
-    dataConnectTools({
-      name: "db",
-      configFile: "generated/tools.json",
-      firebaseApp: app,
-    }),
+    // TODO: add tools from Data Connect
   ],
   model: gemini20Flash,
   promptDir: "src/ai/prompts",

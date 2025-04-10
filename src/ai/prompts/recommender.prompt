@@ -3,7 +3,7 @@ input:
   schema:
     watchHistory?(array): any, 
 toolChoice: required
-tools: [db/SearchMovies, db/SearchReviews, db/FilterMovies, askQuestion, recommendMovies]
+tools: [askQuestion, recommendMovies] # TODO: add tools to search movies and reviews
 maxTurns: 10
 ---
 

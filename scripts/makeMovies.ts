@@ -103,7 +103,9 @@ function generateMovieStub(genre: string) {
 
 const MovieSchema = z.object({
   title: z.string().describe("the title of the movie"),
-  releaseDate: z.string().describe("the release date of the movie in YYYY-MM-DD form"),
+  releaseDate: z
+    .string()
+    .describe("the release date of the movie in YYYY-MM-DD form"),
   description: z.string().describe("a 2-3 sentence description of the movie"),
   genre: z.string().describe("the genre of the movie"),
   tags: z.array(z.string()).describe("relevant tags for the movie"),
@@ -117,7 +119,9 @@ const MovieSchema = z.object({
       z.object({
         actorId: z.string().describe("the id of the actor for this role"),
         character: z.string().describe("the character name of the role"),
-        description: z.string().describe("a one-sentence description of the character"),
+        description: z
+          .string()
+          .describe("a one-sentence description of the character"),
       })
     )
     .describe("the major roles in the movie, create one for each actor"),
@@ -143,9 +147,13 @@ ${JSON.stringify(stubs, null, 2)}`,
     });
 
     movies.push(...(output?.movies || []));
-    writeFileSync("generated-data/movies.json", JSON.stringify({ movies }, null, 2), {
-      encoding: "utf8",
-    });
+    writeFileSync(
+      "generated-data/movies.json",
+      JSON.stringify({ movies }, null, 2),
+      {
+        encoding: "utf8",
+      }
+    );
     console.log("Generated 20", genre, "movies.");
   }
 }
@@ -158,7 +166,9 @@ function nameToKebabCase(name: string): string {
 }
 
 async function generateMoviePosters() {
-  const { movies } = JSON.parse(readFileSync("generated-data/movies.json", { encoding: "utf8" }));
+  const { movies } = JSON.parse(
+    readFileSync("generated-data/movies.json", { encoding: "utf8" })
+  );
   for (const movie of movies) {
     const movieId = nameToKebabCase(movie.title);
     if (existsSync(`generated-data/movies/${movieId}.png`)) continue;
@@ -182,7 +192,10 @@ async function generateMoviePosters() {
       if (response.generatedImages?.[0]?.image?.imageBytes) {
         writeFileSync(
           `generated-data/movies/${movieId}.png`,
-          Buffer.from(response.generatedImages![0]!.image!.imageBytes!, "base64")
+          Buffer.from(
+            response.generatedImages![0]!.image!.imageBytes!,
+            "base64"
+          )
         );
       } else {
         console.error(`${movieId}:`, `${movie.posterDescription}`);
@@ -199,13 +212,16 @@ async function generateMoviePosters() {
 }
 
 async function generateRatingsAndConsensus() {
-  const { movies }: { movies: { id: string; [other: string]: any }[] } = JSON.parse(
-    readFileSync("generated-data/movies.json", { encoding: "utf8" })
-  );
+  const { movies }: { movies: { id: string; [other: string]: any }[] } =
+    JSON.parse(
+      readFileSync("generated-data/movies.json", { encoding: "utf8" })
+    );
 
-  const todoMovies = movies.filter((m) => !m.rating || !m.reviewAvg || !m.reviewConsensus);
-  for (let i = 0; i < todoMovies.length; i += 20) {
-    const movieBatch = todoMovies.slice(i, i + 20);
+  const pendingMovies = movies.filter(
+    (m) => !m.rating || !m.reviewAvg || !m.reviewConsensus
+  );
+  for (let i = 0; i < pendingMovies.length; i += 20) {
+    const movieBatch = pendingMovies.slice(i, i + 20);
 
     const { output } = await ai.generate({
       prompt: `For each imaginary movie listed below, you are going to assign it a rating, an average review score, and a 'review consensus' that describes the aspects of the movie that lead it to receive its average score.
@@ -261,9 +277,13 @@ The above are just examples, think about a wide variety of possible consensus fe
       movie.reviewConsensus = m.reviewConsensus;
       console.log(`${m.id}: ${m.reviewAvg}/10`);
     });
-    writeFileSync("generated-data/movies.json", JSON.stringify({ movies }, null, 2), {
-      encoding: "utf8",
-    });
+    writeFileSync(
+      "generated-data/movies.json",
+      JSON.stringify({ movies }, null, 2),
+      {
+        encoding: "utf8",
+      }
+    );
   }
 }
 

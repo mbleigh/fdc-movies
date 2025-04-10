@@ -1,4 +1,2 @@
 connectorId: tools
-generate:
-  llmTools:
-    outputFile: ../../generated/tools.json
+# TODO: generate tool definitions for movie agent
